@@ -11,7 +11,7 @@ library(readxl)
     #leaf to the lowest wp.
 
 ###Reading in water potential data
-setwd('C:/Documents/Forrestel Lab/GH Drydown/Data/Data_for_github')
+setwd("./Input") #move into the Input folder in vitisdrought
 wp<-read_csv("WP_for_R.csv")
 wp<-wp[-(275:284), ] #Removing empty pots
 meta<-wp[1:5] #saving string metadata before removing non-numerical data(notes) from data columns
@@ -92,7 +92,7 @@ waterpotentials_gathered<-full_join(Leafwaterpotentials_Gathered,swp_Gathered)%>
 #When running this function, select the folder containing all of the licor excel files.
 
 licor6800.point_measurement.compiler<-function(){
-  filenames <- list.files(choose.dir(), pattern="*.xlsx", full.names=TRUE) #pick the folder with 6800 xlsx files
+  filenames <- list.files("Raw 6800 Point measurements", pattern="*.xlsx", full.names=TRUE) #pick the folder with 6800 xlsx files. If unsure replace "Raw 6800 Point measurements" with chose.dir() and manually pick the folder 
   for (filename in filenames) { #cycle through each file and apply the following code to each file 
     meas<-read_xlsx(filename,skip = 14)[-1,] #pulls the relevant measurements from the main tab of the spreadsheet
     id<-(read_xlsx(filename,sheet = "Remarks"))[c(1:6),] #pull the console and head id from the second tab of the spreadsheet
@@ -196,7 +196,7 @@ for (i in codedates) {
 
 #Code compiling porometer excel files long form
 porometer.compiler.long<-function(){
-  filenames <- list.files(choose.dir(), pattern="*.csv", full.names=TRUE)
+  filenames <- list.files("Raw Porometer Files", pattern="*.csv", full.names=TRUE)
   for (x in filenames) {
     meas<-read_csv(x,skip = 1)[-1,]
     meas$`Sample ID`<-str_remove_all(meas$`Sample ID`,"URL:")
@@ -246,7 +246,7 @@ dd1_wreps <- do.call(bind_rows, list)
 dd1_wreps_noneg<-dd1_wreps%>%filter(gsw_porometer >0)%>%
   arrange(Date,Time)
 dd1_wreps_noneg$ID<-gsub(".10",".10.",dd1_wreps_noneg$ID)
-View(dd1_wreps_noneg)
+#View(dd1_wreps_noneg)
 
 
 ###Removing porometer stomatal conductance outliers on IDs with 4+ reps ###
@@ -275,14 +275,14 @@ outliers <- do.call(bind_rows, list)
 
 #Read in cleaned porometer gsw
 gswclean<-read.csv("gsw_porometer_cleaned.csv")
-View(gswclean)
+#View(gswclean)
 
 #look at histograms of  porometer gsw for each treatment of each genotype on each day
 gswclean<-add_column(gswclean, Geno_Date_Treat = paste(gswclean$Genotype,gswclean$Treatment,gswclean$Date,sep = "_"), .after = "Date")
 gswclean$Geno_Date_Treat
 codedates<-unique(gswclean$Geno_Date_Treat)
 
-for (i in codedates) {
+ for (i in codedates) {
   a<-gswclean%>%filter(Geno_Date_Treat == i)%>%ggplot()+
     geom_histogram(aes(x = gsw_porometer,fill = Treatment), binwidth = 0.1)+
     ggtitle(i)
@@ -293,7 +293,7 @@ for (i in codedates) {
 ####Licor 6800 CO2 Curves Consolidation and Cleaning-----------------------------------------------------
 
 licor6800.curve.compiler.long<-function(){
-  filenames <- list.files(choose.dir(), pattern="*.xlsx", full.names=TRUE) #pick the folder with 6800 xlsx files
+  filenames <- list.files("Raw 6800 CO2 Curves/all_6800_CO2_curves", pattern="*.xlsx", full.names=TRUE) #pick the folder with 6800 xlsx files
   for (filename in filenames) {
     meas<-read_xlsx(filename,skip = 14)[-1,]
     id<-(read_xlsx(filename,sheet = "Remarks"))[c(1:6),] #pull the console and head id
@@ -390,21 +390,9 @@ wdlong<-wateringdata%>%
     #This is due to the off-weighted scale difference which was fixed 11/06. 
     #Also there are negative values after removing soil pot and water sometimes, also needing explanation
 
- scaleerrorIDs<-c("UT12-075.9","CC12.7","9018.1","V57-96.3","T48.3","1149.6","T52.5","255189.01.4","b42-24.8","TXNM0821.1","9035.3","9035.9","b42-34.4","b42-24.2","TXNM0821.8","255189.01.6","OCK1-S02.9","V37-96.4","b42-34.7","Vru42.9","2214.4.2","V57-96.9","b40-14.7","ANU65.4","9031.6","TX6704.7","V60-96.9","9031.3","9035.6","CC12.10","UT12-075.7","1149.9","C56-94.4","UT12-075.4","V57-96.1","T52.9","b42-34.8","OCK1-S02.7","TX6704.4","TX6704.10","NY1.7","Haines2.3","T48.5","1149.4","V57-96.7","9035.4","SC2.2","Haines.2","2970.10","V60-96.5","SC2.6","b42-24.9","9031.8","255189.01.3","b40-14.4","9025.2","ANU65.5","2214.4.10","9025.6","588155.01.3","Vru42.4","9018.7","OCK1-S02.5","T52.2","Haines.6","255189.01.10","CC12.5","b42-34.3","Vru42.7","TXNM0821.6","NY1.3","b40-14.8","9018.2","ANU65.7","V60-96.10","T48.9","C56-94.9","2214.4.5","2970.4","588155.01.7","b42-24.4","EP.1","EP.2","EP.3","EP.4","EP.5","EP.6","EP.7","EP.8","EP.9","EP.10")
 
- wdlong2<-wdlong%>%
-   mutate(water = `mH2O (kg)`*(1-`tgt_swc`))%>%
-   mutate(Genotype = replace_na(Genotype,"EP"))%>%
-   mutate(bamboo_weights = case_when(
-     #(Date %in% c('10/26','10/28','10/30') & (ID %in% scaleerrorIDs)) ~ round((TW)+(`mH2O (kg)`*(1-`tgt_swc`))-`mPot (kg)`,digits = 4),
-     (!Date %in% c('12/07','12/09')) & (Genotype != "EP") ~ round(TW+(`mH2O (kg)`*(1-`tgt_swc`))-`mPot (kg)`,digits = 4),
-     TRUE ~ NA_real_))%>%
-   mutate(bamboo_shoots = ifelse(bamboo_weights == 0,1,ifelse(bamboo_weights >0,(bamboo_weights/0.0325)+1,NA)))%>%
-   filter(Date == "12/04")
-    #Date %in% c("12/07","12/09" & ID %in% c("ANU65.3","9035.8","255189.01.8","255189.01.2","Haines2.9","b40-14.3", "2214.4.7", "1149.6", "b42-24.9","1149.9","2214.4.10")),
-#NY1.9 x2
 
-View(wdlong2)            
+View(wdlong)            
 View(wateringdata)
   
 #Bamboo.Shoots = 0.0325kg
