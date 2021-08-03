@@ -1,0 +1,2 @@
+These are all the individual CO2 curve files.
+Nothing to note yet regarding alterations or modifications.

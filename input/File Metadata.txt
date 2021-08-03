@@ -1,0 +1,77 @@
+
+2020_GHDD_Harvest_Data_Metadata------------------------------------------------------------------------------------
+	This file contains all the data collected specifically during harvest, such as canopy biomass, root traits,
+	gravimetric water content, etc. They are all in separate sheet, and units are defined on a units sheet.
+
+	Aboveground Biomass Sheet Protocols: To calculate total leaf area, I divided the leaf wet weight by the partial wet weight and multiplied that value by the leaf area.
+        If there were two bags for one plant, I added the total leaf areas up, then the Leaf wet weight, then the dry weights as well.
+        If the leaf area was missing from bag two, I added the leaf wet weight of bag two to bag one, using the formula of bag 1 for all the biomass
+-------------------------------------------------------------------------------------------------------------------
+controlwateradded126 & controlwateradded1213-----------------------------------------------------------------------
+	These are days control plants recieved supplementary water becasue they had grown so large that the regular watering
+	regime did not provide them with enough water to avoid stress. The watering on these days is currently added in into the code seperately,
+	but likely could just be included in the WU_for_R.
+-------------------------------------------------------------------------------------------------------------------
+Average empty pot weight calculations------------------------------------------------------------------------------
+	Empty pots for control and treatment were each averaged per each day of watering in excel. With days where empty pot values weren't usable (calculations were wrong or people forgot to water.)
+	the closest three days of the same watering volume were averaged and used (if control ep's are messed up, but should have been watered to 
+	80%, and then three days passed before the next watering, I found the most recent day where control empty pots had that condition and use the average of the eps from that day)
+	If three days aren't available, then I used two or one day, as much as there was. I then subtracted the average ep water use per day per treatment from each plant.
+	The sheet with corresponding edits is named wateruse.minus.ep. Units are water added in kg.
+
+   	Some empty pot water use values are higher than the plants for that day, leading to negative water use values for the plants. Also, some plants had 
+	negative water use values before factoring in the empty pots. Since this is impossible, we will likely have to pull them from the water use dataset
+	however, the negative water use values for the plants happened because the post water weight on watering day x-1 was somehow lower than the pre
+	water weight on day x, meaning that the water use for the time between X-1 and X is negative. The difference between post and pre is more than a bamboo shoot, and 
+	is not always accounted for by additional control waterings (see 11/2 and 12/2). However, it is interesting that all these negatives seem to be in the control plants.
+--------------------------------------------------------------------------------------------------------------------
+gsw_6800_cleaned.csv/.xlsx------------------------------------------------------------------------------------------
+	Licor 6800 point measurements cleaned based on stomatal conductance values using the protocols described in the xlsx metadata tab. Use the CSV in R
+--------------------------------------------------------------------------------------------------------------------
+gsw_porometer_cleaned.csv/.xlsx------------------------------------------------------------------------------------------
+	Porometer measurements cleaned based on stomatal conductance values using the protocols described in the xlsx metadata tab.
+	There were some scans, noted in the metadata tab, that were not pulled, but are likely incorrectly labeled plants. CSV is for R.
+--------------------------------------------------------------------------------------------------------------------
+WP_for_R-----------------------------------------------------------------------------------------------------------
+	Raw stem, predawn, and leaf water potential measurements before cleaning.
+--------------------------------------------------------------------------------------------------------------------
+WU_for_R-----------------------------------------------------------------------------------------------------------
+	Raw watering regime data before cleaning.
+	
+	Data Cleanup Notes:
+12/07
+ - target weights are not what were used in situ, but what they should have been. However, since the plants on 12/07 recieved new bamboo shoots AND the 
+   equation got messed up, the target weight was 90% for control and 20% for drought.
+
+12/09 
+ - due to rewatering of treatments on 12/09, the post-water weight column on 12/09
+   is the control post water weight from the initial watering and the treatment post water weight
+   from the rewater.
+ - for water added on 12/09, I combined rthe rewater water added column with the water added column: 
+   ifelse(water<0,rewater,ifelse(rewater<0,water,water+rewater))
+ - For target weight on 12/09 I used the rewater target of 30% for treatment, instead of 20%.
+
+--------------------------------------------------------------------------------------------------------------------
+SWC----------------------------------------------------------------------------------------------------------------
+	Soil water content values calculated in excel, but needing to be redone in R. 
+	The SWC calculation for each plant on each day utilized target weight to get at bamboo shoot number, and was:
+	((pre water weight)-(target weight - (m'h20*(target%SWC for that plant))))/m'h20
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
