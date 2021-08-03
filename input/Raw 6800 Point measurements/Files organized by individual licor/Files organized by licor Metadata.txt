@@ -1,0 +1,2 @@
+Folders specifying EJF1- McElrone are copies of the below list of files, 
+only needed to communicate which licor the file came from
