@@ -11,7 +11,7 @@ library(readxl)
     #leaf to the lowest wp.
 
 ###Reading in water potential data
-setwd("./Input") #move into the Input folder in vitisdrought
+setwd("C:/Users/imnik/Documents/GitHub/vitisdrought/Input") #move into the Input folder in vitisdrought
 wp<-read_csv("WP_for_R.csv")
 wp<-wp[-(275:284), ] #Removing empty pots
 meta<-wp[1:5] #saving string metadata before removing non-numerical data(notes) from data columns
@@ -336,10 +336,10 @@ View(dd)
 
 #NOTE: water supplements for control that were not scheduled waterings (but are recorded in the GHDD Raw Data spreadsheet)
        #may not be in wateringdata as of 5.19.21. Check when you start Water Use code
-
+#getwd()
 
 #Set working directory if need be
-#setwd(choose.dir())
+#setwd("C:/Users/imnik/Documents/GitHub/vitisdrought/Input") #move into the Input folder in vitisdrought
 
 #read in watering data
 wu<-(read_csv("WU_for_R.csv", #warnings are OK
@@ -363,37 +363,7 @@ for (i in f) {
   names(b)[length(names(b))]<- i }
 cleanwu1<-b[-c(1,2,3,4)]
 wateringdata<-cbind(metawu,lapply(cleanwu1,as.numeric))
-#cleanwu<-wu
 #View(wateringdata)
-
-#making watering data long form and accounting for differences in target water content for treatment vs control. 
- #Target water content (% soil saturation to field capacity) for each day of watering can be found in the GHDD raw data spreadsheet, 
- #in a note in the target water content column for each watering day
-
-wdlong<-wateringdata%>%
-  pivot_longer(colnames(wateringdata[9:ncol(wateringdata)]),
-             names_to = c("Date", ".value"),
-             names_pattern = "(.+)_(.+)")%>%
-  mutate(tgt_swc = case_when(
-    Date %in% c("10/23","10/26","10/28","10/30","11/02") ~ 0.8,
-    Date %in% c("11/04","11/06","11/09","11/11","11/13","11/16") & Treatment == "Control" ~ 0.8,
-    Date %in% c("11/18","11/20","11/23","11/25","11/27","11/30",
-                "12/02","12/04","12/07","12/09","12/11","12/13",
-                "12/14","12/15","12/16","12/17") & Treatment == "Control" ~ 0.9,
-    Date %in% c("11/04","11/06","11/09") & Treatment == "Drought" ~ 0.5,
-    Date %in% c("11/11") & Treatment == "Drought" ~ 0.4,
-    Date %in% c("11/13","11/16","11/18","11/20","11/23","11/25","11/27","11/30","12/02") & Treatment == "Drought" ~ 0.3,
-    Date %in% c("12/04","12/07") & Treatment == "Drought" ~ 0.2,
-    Date %in% c("12/09","12/11","12/13","12/14","12/15","12/16","12/17") & Treatment == "Drought" ~ 0.3))
-#View(wdlong)
-#Attempting to add a column with bamboo shoots to watering data. Current problem is that the weight remaining after removing all soil, pot and water weights does not evenly divide into the bamboo shoot weight.
-    #This is due to the off-weighted scale difference which was fixed 11/06. 
-    #Also there are negative values after removing soil pot and water sometimes, also needing explanation
-
-
-
-View(wdlong)            
-View(wateringdata)
   
 #Bamboo.Shoots = 0.0325kg
 
@@ -430,63 +400,98 @@ vols1213<-read_csv("controlwateradded1213.csv")
 #write_csv(post1217,"post127.csv")
 
 
-###THIS CODE IS OUTDATED AS OF 7/20/21, cleanwu NEEDS TO BE wateringdata AND VARIABLE TERMS NEED TO BE CHANGED TO wateringdata VARIABLES
-#View(cleanwu) #Cleanwu was generated at the beginning of the water use chunk
+
+#WATER USE CODE IN PROGRESS: CURRENT PROJECTS
+#   - try and address as many NA values as possible
+#   - incorporate bamboo values
+#   - 
+#
+
+#View(wateruse)
 #Addressing each period of water consumption before considering empty pots
-wateruse_cleaned<-cleanwu%>%
-  mutate_at(colnames(cleanwu[5:ncol(cleanwu)]), as.numeric)%>%
+wateruse<-wateringdata%>%
+  mutate_at(colnames(wateringdata[5:ncol(wateringdata)]), as.numeric)%>%
   #approx columns are from before we started taking post water weights, so if we went over in our watering, there is no record of that.
-  mutate("10/23-10/26 WU (approx)" = cleanwu$`10/26 Water added for 80%SW`)%>%
-  mutate("10/26-10/28 WU (approx)" = cleanwu$`10/28 Water added for 80%SW`)%>%
-  mutate("10/28-10/30 WU (approx)" = cleanwu$`10/30 Water added for 80%SW`)%>%
-  mutate("10/30-11/2 WU (approx)" = (cleanwu$`11/2 Water added for 80%SW`))%>%
-  mutate("11/2-11/4 WU" = cleanwu$`11/2 post water weight`-cleanwu$`11/4 pre water`)%>%
-  mutate("11/4-11/6 WU" = cleanwu$`11/4 post water`-cleanwu$`11/6 pre water`)%>%
-  mutate("11/6-11/9 WU" = cleanwu$`11/6 post water`-cleanwu$`11/9 pre water`)%>%
-  mutate("11/9-11/11 WU" = cleanwu$`11/9 post water`-cleanwu$`11/11 pre water weight`)%>%
-  mutate("11/11-11/13 WU" = cleanwu$`11/11 post water weight`-cleanwu$`11/13 pre water weight`)%>%
+  mutate("10/26_WU" = wateringdata$`10/26_WA`)%>%
+  mutate("10/28_WU" = wateringdata$`10/28_WA`)%>%
+  mutate("10/30_WU" = wateringdata$`10/30_WA`)%>%
+  mutate("11/02_WU" = wateringdata$`10/30_TW`-wateringdata$`11/02_PWW`)%>%
+  mutate("11/02_WU" = ifelse(wateringdata$Treatment== "Control",wateringdata$`11/02_WA`, #drought treatments weren't watered, so I subtracted the pww from 11/2 from the target weight on 10/30
+                            wateringdata$`10/30_TW`-wateringdata$`11/02_PWW`))%>%
+  mutate("11/04_WU" = ifelse(wateringdata$Treatment == "Control", wateringdata$`11/02_POWW`-wateringdata$`11/04_PWW`,
+                             wateringdata$`11/02_PWW`-wateringdata$`11/04_PWW`))%>%
+  mutate("11/06_WU" = wateringdata$`11/04_POWW`-wateringdata$`11/06_PWW`)%>%
+  mutate("11/09_WU" = wateringdata$`11/06_POWW`-wateringdata$`11/09_PWW`)%>%
+  mutate("11/11_WU" = wateringdata$`11/09_POWW`-wateringdata$`11/11_PWW`)%>%
+  mutate("11/13_WU" = wateringdata$`11/11_POWW`-wateringdata$`11/13_PWW`)%>%
   #on 11/15 there was a (likely? I can't remember and havent found anything in notes) hydration to saturation of the controls to prep for ALS, so they
-  #couldnt be compared to the between-waterings water useage of the drought treatment. 11/15 has the control drained weight column which isnt very helpful.
+  #couldnt be compared to the between-waterings water usage of the drought treatment. 11/15 has the control drained weight column which isnt very helpful.
   #Additionally, since treatments were not watered on 11/13, the pre water weight on 11/13 was used instead of the post water weight
-  mutate("11/13-11/16 WU" = ifelse(cleanwu$Treatment == "Drought", cleanwu$`11/13 pre water weight`-cleanwu$`11/16 pre water weight`, NA_character_))%>%
+  mutate("11/16_WU" = ifelse(wateringdata$Treatment == "Drought", wateringdata$`11/13_PWW`-wateringdata$`11/16_PWW`, NA_character_))%>%
   #Since controls were not watered on 11/16, the pre water weights of the control plants were used to calculate 11/18 WU instead of the post-water weights.
   #Additionally, many plants were missing 11/18 since they went to ALS.
-  mutate("11/16-11/18 WU" = ifelse(cleanwu$Treatment == "Drought", cleanwu$`11/16 post water weight`-cleanwu$`11/18 pre water weight`,
-                                   cleanwu$`11/16 pre water weight`-cleanwu$`11/18 pre water weight`))%>%
-  mutate("11/18-11/20 WU" =  cleanwu$`11/18 post water`-cleanwu$`11/20 pre water weight`)%>%
-  mutate("11/20-11/23 WU" =  cleanwu$`11/20 post water weight`-cleanwu$`11/23 pre water weight`)%>%
-  mutate("11/23-11/25 WU" =  cleanwu$`11/23 post water weight`-cleanwu$`11/25 pre water weight`)%>%
-  mutate("11/25-11/27 WU" =  cleanwu$`11/25 post water weight`-cleanwu$`11/27 pre water weight`)%>%
+  mutate("11/18_WU" = ifelse(wateringdata$Treatment == "Drought", wateringdata$`11/16_POWW`-wateringdata$`11/18_PWW`,
+                                   wateringdata$`11/16_PWW`-wateringdata$`11/18_PWW`))%>%
+  mutate("11/20_WU" =  wateringdata$`11/18_POWW`-wateringdata$`11/20_PWW`)%>%
+  mutate("11/23_WU" =  wateringdata$`11/20_POWW`-wateringdata$`11/23_PWW`)%>%
+  mutate("11/25_WU" =  wateringdata$`11/23_POWW`-wateringdata$`11/25_PWW`)%>%
+  mutate("11/27_WU" =  wateringdata$`11/25_POWW`-wateringdata$`11/27_PWW`)%>%
   #On 11/29 control plants received 600ml of water. So I just added this as .6kg of water at the end of the calculation for controls
-  mutate("11/27-11/30 WU" =  ifelse(cleanwu$Treatment == "Drought", cleanwu$`11/27 post water weight`-cleanwu$`11/30 pre water weight`,
-                                    (cleanwu$`11/27 post water weight`-cleanwu$`11/30 pre water weight`)+0.6))%>%
-  mutate("11/30-12/2 WU" =  cleanwu$`11/30 post water weight`-cleanwu$`12/2 pre water weight`)%>%
-  mutate("12/2-12/4 WU" =  cleanwu$`12/2 post water weight`-cleanwu$`12/4 pre water weight`)%>%
+  mutate("11/30_WU" =  ifelse(wateringdata$Treatment == "Drought", wateringdata$`11/27_POWW`-wateringdata$`11/30_PWW`,
+                                    (wateringdata$`11/27_POWW`-wateringdata$`11/30_PWW`)+0.6))%>%
+  mutate("12/02_WU" =  wateringdata$`11/30_POWW`-wateringdata$`12/02_PWW`)%>%
+  mutate("12/04_WU" =  wateringdata$`12/02_POWW`-wateringdata$`12/04_PWW`)%>%
   #controls were watered twice this week in addition. Once consistently 500ml and once varying amounts, recorded in a column.
-  mutate("12/4-12/7 WU" =  ifelse(cleanwu$Treatment == "Drought", cleanwu$`12/4 post water weight`-cleanwu$`12/7 pre water weight`,
-                                  (cleanwu$`12/4 post water weight`-cleanwu$`12/7 pre water weight`)+0.5+(vols126$`X12.6.control.water.added`)*.001))%>%
+  mutate("12/07_WU" =  ifelse(wateringdata$Treatment == "Drought", wateringdata$`12/04_POWW`-wateringdata$`12/07_PWW`,
+                                  (wateringdata$`12/04_POWW`-wateringdata$`12/07_PWW`)+0.5+(vols126$`X12.6.control.water.added`)*.001))%>%
   #controls were watered an additional 500ml. Target weights were off this week.
-  mutate("12/7-12/9 WU" =  ifelse(cleanwu$Treatment == "Drought", cleanwu$`12/7 post water weight`-cleanwu$`12/9 pre water weight`,
-                                  (cleanwu$`12/7 post water weight`-cleanwu$`12/9 pre water weight`)+0.5))%>%
+  mutate("12/09_WU" =  ifelse(wateringdata$Treatment == "Drought", wateringdata$`12/07_POWW`-wateringdata$`12/09_PWW`,
+                                  (wateringdata$`12/07_POWW`-wateringdata$`12/09_PWW`)+0.5))%>%
   #controls were watered an additional 500ml. Also, on 12/9 we fixed the target weights, and rewatered treatments to target. So those that got rewatered have a seperate post water weight
-  mutate("12/9-12/11 WU" =  ifelse(cleanwu$Treatment == "Drought",
-                                   ifelse(is.na(cleanwu$`12/9 rewater post water weight`) == TRUE, cleanwu$`12/9 post water weight`-cleanwu$`12/11 pre-water weight`,
-                                          (cleanwu$`12/9 rewater post water weight`-cleanwu$`12/11 pre-water weight`)),
-                                   ifelse(is.na(cleanwu$`12/9 rewater post water weight`) == TRUE, (cleanwu$`12/9 post water weight`-cleanwu$`12/11 pre-water weight`)+0.5,
-                                          (cleanwu$`12/9 rewater post water weight`-cleanwu$`12/11 pre-water weight`)+0.5)))%>%
+  mutate("12/11_WU" =  ifelse(wateringdata$Treatment == "Drought",
+                                   ifelse(is.na(wateringdata$`12/09_POWW`) == TRUE, wateringdata$`12/09_POWW`-wateringdata$`12/11_PWW`,
+                                          (wateringdata$`12/09_POWW`-wateringdata$`12/11_PWW`)),
+                                   ifelse(is.na(wateringdata$`12/09_POWW`) == TRUE, (wateringdata$`12/09_POWW`-wateringdata$`12/11_PWW`)+0.5,
+                                          (wateringdata$`12/09_POWW`-wateringdata$`12/11_PWW`)+0.5)))%>%
   #Another day of varied bonus watering for the control (and sometimes treatment? think they were accidents)
-  mutate("12/11-12/14 WU" =  ifelse(cleanwu$Treatment == "Drought", (cleanwu$`12/11 post-water weight`-cleanwu$`12/14 pre-water weight`)+vols1213$X12.13.water.added,
-                                    (cleanwu$`12/11 post-water weight`-cleanwu$`12/14 pre-water weight`)+vols1213$X12.13.water.added))%>%
-  mutate("12/14-12/16 WU" =  cleanwu$`12/14 post water weight`-cleanwu$`12/16 pre-water weight`)%>%
-  mutate("12/16-12/17 WU" =  cleanwu$`12/16 post-water weight`-cleanwu$`12/17 pre water weight`)%>%
-  select(1,2,3,4,5,6,7,8,contains(c("WU")))
+  mutate("12/14_WU" =  ifelse(wateringdata$Treatment == "Drought", (wateringdata$`12/11_POWW`-wateringdata$`12/14_PWW`)+vols1213$X12.13.water.added,
+                                    (wateringdata$`12/11_POWW`-wateringdata$`12/14_PWW`)+vols1213$X12.13.water.added))%>%
+  mutate("12/16_WU" =  wateringdata$`12/14_POWW`-wateringdata$`12/16_PWW`)%>%
+  mutate("12/17_WU" =  wateringdata$`12/16_POWW`-wateringdata$`12/17_PWW`)%>%
+  mutate("11/16_WU" =  as.numeric("11/16_WU"))%>%
+  slice(-(275:284))
+#%>%
+#  select(1,2,3,4,5,6,7,8,contains(c("WU")))
 
 
-#View(wateruse_cleaned)
+View(wateruse)
 
-#write.csv(wateruse_cleaned,"wateruse.preep.csv")
+#making watering data long form and accounting for differences in target water content for treatment vs control. 
+#Target water content (% soil saturation to field capacity) for each day of watering can be found in the GHDD raw data spreadsheet, 
+#in a note in the target water content column for each watering day
+
+wdlong<-wateruse%>%
+  pivot_longer(colnames(wateruse[9:ncol(wateruse)]),
+               names_to = c("Date", ".value"),
+               names_pattern = "(.+)_(.+)")%>%
+  mutate(tgt_swc = case_when(
+    Date %in% c("10/23","10/26","10/28","10/30","11/02") ~ 0.8,
+    Date %in% c("11/04","11/06","11/09","11/11","11/13","11/16") & Treatment == "Control" ~ 0.8,
+    Date %in% c("11/18","11/20","11/23","11/25","11/27","11/30",
+                "12/02","12/04","12/07","12/09","12/11","12/13",
+                "12/14","12/15","12/16","12/17") & Treatment == "Control" ~ 0.9,
+    Date %in% c("11/04","11/06","11/09") & Treatment == "Drought" ~ 0.5,
+    Date %in% c("11/11") & Treatment == "Drought" ~ 0.4,
+    Date %in% c("11/13","11/16","11/18","11/20","11/23","11/25","11/27","11/30","12/02") & Treatment == "Drought" ~ 0.3,
+    Date %in% c("12/04","12/07") & Treatment == "Drought" ~ 0.2,
+    Date %in% c("12/09","12/11","12/13","12/14","12/15","12/16","12/17") & Treatment == "Drought" ~ 0.3))
+
+View(wdlong)            
+
+
+#write.csv(wateruse,"wateruse.preep.csv")
 ##Addressing Empty Pots:
-emptypots<-wateruse_cleaned%>%filter(is.na(Genotype))
+emptypots<-wateruse%>%filter(is.na(Genotype))
 
 #write_csv(emptypots,"emptypots.csv")
 
