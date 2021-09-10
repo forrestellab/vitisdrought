@@ -360,7 +360,7 @@ for (i in f) {
   b<-cbind.data.frame(b,a)
   names(b)[length(names(b))]<- i }
 cleanwu1<-b[-c(1,2,3,4)]
-wateringdata<-cbind(metawu,lapply(cleanwu1,as.numeric))
+wateringdata<-cbind(metawu,lapply(cleanwu1,as.numeric))%>%select(!`11/15_cntrl.drained.wt`)%>%select(!contains("11/15_BB"))
 #View(wateringdata)
 
 ##Calculating Water Use## Water use is the amount of water consumed by the plant since the last watering (Kg).
@@ -395,14 +395,6 @@ vols1213<-read_csv("controlwateradded1213.csv")
 #post127<-data.frame("12/7 post water weight" = as.numeric(rre)) 
 #write_csv(post1217,"post127.csv")
 
-
-
-#WATER USE CODE IN PROGRESS: CURRENT PROJECTS
-#   - try and address as many NA values as possible
-#   - incorporate bamboo values
-#   - %>% 
-#mutate_if(is.numeric, replace_na,0)
-#
 
 #Calculating empty pot water use
 
@@ -454,11 +446,11 @@ emptypots[emptypots<0]<-NA
 emptypotsAVG<-emptypots%>%
   group_by(Treatment)%>%
   summarise(across(everything(),~ mean(., na.rm = TRUE)))
-View(emptypotsAVG)
+#View(emptypotsAVG)
 
 #
 
-#View(wateruse)
+#View(wateringdata)
 #Addressing each period of water consumption including an ifelse that subtracts the empty pot water use (evaporation) from each treatment type on each day
 wateruse<-wateringdata%>%
   mutate_at(colnames(wateringdata[5:ncol(wateringdata)]), as.numeric)%>%
@@ -512,18 +504,18 @@ wateruse<-wateringdata%>%
   mutate("11/30_WU" =  ifelse(wateringdata$Treatment == "Drought", wateringdata$`11/27_POWW`-wateringdata$`11/30_PWW`-as.numeric(paste0(emptypotsAVG%>%filter(Treatment == "Drought")%>%select(`11/30_WU`))),
                               (wateringdata$`11/27_POWW`-wateringdata$`11/30_PWW`)+0.6-as.numeric(paste0(emptypotsAVG%>%filter(Treatment == "Control")%>%select(`11/30_WU`)))))%>%
   mutate("12/02_WU" =  wateringdata$`11/30_POWW`-wateringdata$`12/02_PWW`-ifelse(wateringdata$Treatment== "Control", 
-                                                                                 as.numeric(paste0(emptypotsAVG%>%filter(Treatment == "Control")%>%select(`12/02_WU`))),
+                                                                                 as.numeric(paste0(emptypotsAVG%>%filter(Treatment == "Control")%>%select(`12/02_WU`)))-0.6,
                                                                                  as.numeric(paste0(emptypotsAVG%>%filter(Treatment == "Drought")%>%select(`12/02_WU`)))))%>%
   mutate("12/04_WU" =  wateringdata$`12/02_POWW`-wateringdata$`12/04_PWW`-ifelse(wateringdata$Treatment== "Control", 
-                                                                                 as.numeric(paste0(emptypotsAVG%>%filter(Treatment == "Control")%>%select(`12/04_WU`))),
+                                                                                 as.numeric(paste0(emptypotsAVG%>%filter(Treatment == "Control")%>%select(`12/04_WU`)))-0.6,
                                                                                  as.numeric(paste0(emptypotsAVG%>%filter(Treatment == "Drought")%>%select(`12/04_WU`)))))%>%
   #controls were watered twice this week in addition. Once consistently 500ml and once varying amounts, recorded in a column.
   mutate("12/07_WU" =  ifelse(wateringdata$Treatment == "Drought", wateringdata$`12/04_POWW`-wateringdata$`12/07_PWW`-as.numeric(paste0(emptypotsAVG%>%filter(Treatment == "Drought")%>%select(`12/07_WU`))),
-                              (wateringdata$`12/04_POWW`-wateringdata$`12/07_PWW`)-as.numeric(paste0(emptypotsAVG%>%filter(Treatment == "Control")%>%select(`12/07_WU`)))+0.5+(vols126$`X12.6.control.water.added`)*.001))%>%
+                              (wateringdata$`12/04_POWW`-wateringdata$`12/07_PWW`)-as.numeric(paste0(emptypotsAVG%>%filter(Treatment == "Control")%>%select(`12/07_WU`)))+0.5+(vols126$`X12.6.control.water.added`*.001)))%>%
   #controls were watered an additional 500ml. Target weights were off this week.
   mutate("12/09_WU" =  ifelse(wateringdata$Treatment == "Drought", wateringdata$`12/07_POWW`-wateringdata$`12/09_PWW`-as.numeric(paste0(emptypotsAVG%>%filter(Treatment == "Drought")%>%select(`12/09_WU`))),
                               (wateringdata$`12/07_POWW`-wateringdata$`12/09_PWW`)+0.5-as.numeric(paste0(emptypotsAVG%>%filter(Treatment == "Control")%>%select(`12/09_WU`)))))%>%
-  #controls were watered an additional 500ml. Also, on 12/9 we fixed the target weights, and rewatered treatments to target. So those that got rewatered have a seperate post water weight
+  #controls were watered an additional 500ml. Also, on 12/9 we fixed the target weights, and rewatered treatments to target. So those that got rewatered have a separate post water weight
   mutate("12/11_WU" =  ifelse(wateringdata$Treatment == "Drought",
                               ifelse(is.na(wateringdata$`12/09_POWW`) == TRUE, wateringdata$`12/09_POWW`-wateringdata$`12/11_PWW`,
                                      (wateringdata$`12/09_POWW`-wateringdata$`12/11_PWW`))-as.numeric(paste0(emptypotsAVG%>%filter(Treatment == "Drought")%>%select(`12/11_WU`))),
@@ -539,19 +531,19 @@ wateruse<-wateringdata%>%
                                                                                   as.numeric(paste0(emptypotsAVG%>%filter(Treatment == "Control")%>%select(`12/17_WU`))),
                                                                                   as.numeric(paste0(emptypotsAVG%>%filter(Treatment == "Drought")%>%select(`12/17_WU`)))))
 
-#replacing negative water use values (an indication of incorrectly recording pre or post water weights)
+#replacing negative water use values (an indication of incorrectly recorded pre or post water weights when entering the data after each watering day)
 wateruse1<-wateruse
 wateruse1[wateruse1<0] <- NA
 #View(wateruse1)
 wateruse[149:ncol(wateruse)]<- wateruse1[149:ncol(wateruse1)]
 
-View(wateruse)
+#View(wateruse)
 
 #making watering data long form and accounting for differences in target water content for treatment vs control. 
 #Target water content (% soil saturation to field capacity) for each day of watering was pulled from the GHDD raw data spreadsheet, 
 #in a note in the target water content column for each watering day
 
-#NOTES: Things to add to this code - investigating water use values close to zero, and values that are very high 
+#NOTES: Things to add to this code - investigating water use values close to zero, and values that are very high (look at errors in water added column for harvest time) 
 
 wdlong<-wateruse[1:274,]%>%
   pivot_longer(colnames(wateruse[9:ncol(wateruse)]),
@@ -567,25 +559,81 @@ wdlong<-wateruse[1:274,]%>%
     Date %in% c("11/11") & Treatment == "Drought" ~ 0.4,
     Date %in% c("11/13","11/16","11/18","11/20","11/23","11/25","11/27","11/30","12/02") & Treatment == "Drought" ~ 0.3,
     Date %in% c("12/04","12/07") & Treatment == "Drought" ~ 0.2,
-    Date %in% c("12/09","12/11","12/13","12/14","12/15","12/16","12/17") & Treatment == "Drought" ~ 0.3))
+    Date %in% c("12/09","12/11","12/13","12/14","12/15","12/16","12/17") & Treatment == "Drought" ~ 0.3))%>%
+  #HERE DOWN IS ADDRESSING ERRORS IN DATA ENTRY FOR WATER USE AND SWC
+  filter(!Date == "11/16" | !Treatment == "Control")%>% #Controls were not watered on 11/16 so there should not have been SWC (?) Think about this one
+  filter(!Date == "11/18" | !Genotype == "TX6704")%>% #These genotypes were mostly gone to ALS so there was 1 rep for each SWC value. I therefore removed the genotypes with this being the case. 
+  filter(!Date == "11/18" | !Genotype == "9018")%>%
+  filter(!Date == "11/18" | !Genotype == "b40-14")%>%
+  filter(!Date == "11/18" | !Genotype == "b42-34")%>%
+  filter(!Date == "11/18" | !Genotype == "b42-34")%>%
+  filter(!Date == "11/18" | !Genotype == "NY1")%>%
+  filter(!Date == "11/18" | !Genotype == "T48")%>%
+  filter(!Date == "11/18" | !Genotype == "T52")%>%
+  filter(!Date == "11/18" | !Genotype == "TXNM0821")%>%
+  filter(!Date == "11/18" | !Genotype == "Vru42")%>%
+  filter(!Date == "11/18" | !Genotype == "V60-96")%>%
+  filter(!Date == "11/27" | !ID == "T48.5" )%>% #This plant had the pre water weight incorrectly entered, since it supposedly gained 2 kg of weight in 2 days instead of losing weight due to water use. I removed the data point.
+  filter(!Date == "12/11" | !ID == "b42-34.1" )%>% #This plant also had the pre water weight incorrectly entered, since it supposedly also gained 2 kg of weight in 2 days instead of losing weight due to water use. I removed the data point.
+  filter(!Date == "12/11" | !ID == "V60-96.9" )%>% #The control group only has one rep on this day so I removed it
+  filter(!Date == "12/16" | !ID == "V60-96.9" )%>% #The control group only has one rep on this day so I removed it
+  filter(!Date == "12/13" | !ID == "V57-96" )%>% #The control group only has one rep on this day so I removed it
+  filter(!Date == "12/15" | !ID == "V57-96" )%>% #The control group only has one rep on this day so I removed it
+  filter(!Date == "12/17" | !ID == "V57-96" | !Treatment == "Control" )%>% #The control group only has one rep on this day so I removed it
+  filter(!Date == "12/13",!Date == "12/15", !Date == "12/17")%>% #These were days where the individual benches were hydrated for harvest the next day, not the normal watering schedule. Sine we continued to water normally during harvest I removed these other days.
+  filter(!Date == "12/16"|!ID == "SC2") #There was only one rep on 12/16 per treatment so I removed that day
 
-View(wdlong)            
+
+#View(wdlong)            
 
 
-ghdd_data_pre_harvest<-full_join(ghdd_data_long_form%>%
-                                   mutate(Date = format(as.Date(Date, "%m.%d"),"%m/%d")),
-                                 WU_Gathered%>%select(!Species))%>%
-  mutate(Date = format(as.Date(Date, "%m/%d"),"%m/%d"))
-ghdd_data_pre_harvest<-modify_at(ghdd_data_pre_harvest,.at = colnames(ghdd_data_pre_harvest%>%select(!c("ID","Time","Genotype","Treatment","Date","6800_licor_id"))),~as.numeric(as.character(.)))
-#View(ghdd_data_pre_harvest)
-#write_csv(ghdd_data_pre_harvest,"GHDD_Data_Pre_Harvest-2020.csv")
+
 
 ###Soil Water Content Consolidation and Cleaning---------------------------------------------------------------------------------
 #Needs to be redone in R
 
 
+#swc equation should be the percent value of water in the soil, 100% being fully saturated soil.
+#soil water content should be the mean of the  swc of the previous day after watering and the swc of that day before watering
+
+#OTHER ERRORS IN DATA INPUT ADDRESSED IN THE INPUT FILES - B40-14.8 on 11/27 had 3.3625 instead of 6.3625 as POWW, I fixed this
 
 
+swc<-wdlong%>%
+  arrange(ID,Date)%>%
+  mutate(SWC = ((lag((ifelse(is.na(POWW),ifelse(is.na(PWW),TW,PWW),POWW)-(TW-(`mH2O (kg)`*tgt_swc)))/`mH2O (kg)`,1)+((PWW-(TW-(`mH2O (kg)`*tgt_swc)))/`mH2O (kg)`))/2))%>%
+  filter(SWC<1 |!SWC>0) 
+
+#Here down is code addressing errors in data entry
+  filter(!Date == "11/16" | !Treatment == "Control")%>% #Controls were not watered on 11/16 so there should not have been SWC (?) Think about this one
+  filter(!Date == "11/18" | !Genotype == "TX6704")%>% #These genotypes were mostly gone to ALS so there was 1 rep for each SWC value. I therefore removed the genotypes with this being the case. 
+  filter(!Date == "11/18" | !Genotype == "9018")%>%
+  filter(!Date == "11/18" | !Genotype == "b40-14")%>%
+  filter(!Date == "11/18" | !Genotype == "b42-34")%>%
+  filter(!Date == "11/18" | !Genotype == "b42-34")%>%
+  filter(!Date == "11/18" | !Genotype == "NY1")%>%
+  filter(!Date == "11/18" | !Genotype == "T48")%>%
+  filter(!Date == "11/18" | !Genotype == "T52")%>%
+  filter(!Date == "11/18" | !Genotype == "TXNM0821")%>%
+  filter(!Date == "11/18" | !Genotype == "Vru42")%>%
+  filter(!Date == "11/18" | !Genotype == "V60-96")%>%
+  filter(!Date == "11/27" | !ID == "T48.5" )%>% #This plant had the pre water weight incorrectly entered, since it supposedly gained 2 kg of weight in 2 days instead of losing weight due to water use. I removed the data point.
+  filter(!Date == "12/11" | !ID == "b42-34.1" )%>% #This plant also had the pre water weight incorrectly entered, since it supposedly also gained 2 kg of weight in 2 days instead of losing weight due to water use. I removed the data point.
+  filter(!Date == "12/11" | !ID == "V60-96.9" )%>% #The control group only has one rep on this day so I removed it
+  filter(!Date == "12/16" | !ID == "V60-96.9" )%>% #The control group only has one rep on this day so I removed it
+  filter(!Date == "12/13" | !ID == "V57-96" )%>% #The control group only has one rep on this day so I removed it
+  filter(!Date == "12/15" | !ID == "V57-96" )%>% #The control group only has one rep on this day so I removed it
+  filter(!Date == "12/17" | !ID == "V57-96" | !Treatment == "Control" )%>% #The control group only has one rep on this day so I removed it
+  filter(!Date == "12/13",!Date == "12/15", !Date == "12/17")%>% #These were days where the individual benches were hydrated for harvest the next day, not the normal watering schedule. Sine we continued to water normally during harvest I removed these other days.
+  filter(!Date == "12/16"|!ID == "SC2") #There was only one rep on 12/16 per treatment so I removed that day
+  
+#View(swc)
+
+#old consolidation code
+
+ghdd_data_pre_harvest<-modify_at(ghdd_data_pre_harvest,.at = colnames(ghdd_data_pre_harvest%>%select(!c("ID","Time","Genotype","Treatment","Date","6800_licor_id"))),~as.numeric(as.character(.)))
+#View(ghdd_data_pre_harvest)
+#write_csv(ghdd_data_pre_harvest,"GHDD_Data_Pre_Harvest-2020.csv")
 
 ####Harvest Data Consolidation and Cleaning----------------------------------------------------------------------------------------
 #setwd(choose.dir())
@@ -819,39 +867,27 @@ ggplot(aes(y =WU, x = as.Date(Date,"%m/%d"), color = Treatment))+
   print(wuplot)
 }
 
+##Investigating WU Irregularities####
+
+
+
 ####SWC Graphs----------------------------------------------------------------------------
+accessions<-unique(swc$Genotype)
 
-#NEEDS TO BE REFORMATTED ONCE SWC CALCULATIONS ARE REDONE IN R - 7/21/21
-
-##DailySWC##
-#CURRENTLY EDITED TO FIND WHY THERE ARE SWC IRREGULARITIES 
-SWC_plot<-GHDD_Preharvest%>%
-  filter(!is.na(SWC))%>%
-  filter(!(Date == "11/16" & Treatment == "Control"))%>% #Removing erroneous control weights on 11/13
-  filter(Genotype== "255189.01")%>%
-  #filter(Treatment == "Control")%>%
-  #one input in the raw data sheet had a comma not a decimal place leading to a huge swc. I can go in and fix
-  filter(SWC <500)%>%
-  #filter(Date == "11/18")%>%
-  select(SWC,Date,Genotype,ID,Treatment)%>%
-  arrange(Date,SWC)%>%
-  distinct()
-View(SWC_plot)
-genos<-unique(SWC_plot$Genotype)
-genos<-genos[!is.na(genos)]
-
-for (i in genos) {
+for (i in accessions) {
   
-  error.df <- SWC_plot %>%
+  error.df <- swc %>%
     filter(Genotype == i)%>%
     group_by(Date, Treatment) %>%
     summarise(
       sd = sd(SWC, na.rm = TRUE),
-      len = mean(SWC),
+      len = mean(SWC,na.rm = TRUE),
       Treatment = Treatment,
-      Date = Date)
+      Date = Date)%>%
+    unique()
   
-  graph<-SWC_plot%>%
+  
+  swcplot<-swc%>%
     filter(Genotype == i)%>%
     ggplot(aes(y =SWC, x = as.Date(Date,"%m/%d"), color = Treatment))+
     stat_summary(fun="mean",geom="line",size = 1)+
@@ -867,11 +903,23 @@ for (i in genos) {
     theme_classic()+
     theme(axis.text.x = element_text(angle = 60, hjust = 1))+
     scale_x_date(date_labels="%m/%d",date_breaks  ="7 days")+
+    ylim(0,1.00)+
     xlab(label = "Date")+
     ggtitle(i)
-  print(graph)
-  
-} ##Warnings are ok
+  print(swcplot)
+}
+#View(error.df)
+##Investigating SWC irregularities####
 
+#Look into SWC around 11/18 which seems to have spikes in many plants, Also harvest things get weird
 
+View(wateruse%>%
+       filter(Genotype == "V60-96"))
+View(swc%>%
+       filter(Genotype == "TX6704", Date == "11/20"))
+View(swc%>%
+       filter(Genotype == "2970", Treatment == "Control"))
+View(swc%>%
+       filter(Genotype == "TX6704"))
 
+View(swc %>% group_by(Genotype, Treatment,Date)%>%count(Date)) #%>% filter(n >= 3))
