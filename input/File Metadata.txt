@@ -41,6 +41,7 @@ gsw_porometer_cleaned.csv/.xlsx-------------------------------------------------
 --------------------------------------------------------------------------------------------------------------------
 WP_for_R-----------------------------------------------------------------------------------------------------------
 	Raw stem, predawn, and leaf water potential measurements before cleaning.
+	Code to calculate leaf area is here: https://colab.research.google.com/drive/1XfOQfG73USYh1va3iXiltC2aqtPyQbZn?usp=sharing
 --------------------------------------------------------------------------------------------------------------------
 WU_for_R-----------------------------------------------------------------------------------------------------------
 	Raw watering regime data before cleaning.
