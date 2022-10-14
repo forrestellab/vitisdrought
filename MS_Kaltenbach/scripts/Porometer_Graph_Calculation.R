@@ -12,7 +12,7 @@ library(ggpubr)
 #also I have to figure out on what bounds to bin sample days.
 
 
-setwd("~/Documents/Master_Thesis/Master_Thesis")
+setwd("~/Documents/GitHub/vitisdrought/MS_Kaltenbach")
 
 gswclean<-read.csv("data/gsw_porometer_cleaned.csv")
 

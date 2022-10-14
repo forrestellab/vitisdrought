@@ -1,3 +1,5 @@
+setwd("~/Documents/GitHub/vitisdrought/MS_Kaltenbach")
+
 accessions<-unique(swclong$Genotype) # unique() used to eliminate or delete the duplicate values/ rows present
 
 for (i in accessions) {

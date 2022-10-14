@@ -1,3 +1,5 @@
+setwd("~/Documents/GitHub/vitisdrought/MS_Kaltenbach")
+
 ## soil water content: Considilation & Cleaning (Miriam)
 #----------------------------'
 

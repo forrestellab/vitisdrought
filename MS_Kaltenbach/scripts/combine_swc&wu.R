@@ -8,7 +8,7 @@ library(ggpubr)
 
 #set working directory
 
-setwd("~/Documents/Master_Thesis/Master_Thesis")
+setwd("~/Documents/GitHub/vitisdrought/MS_Kaltenbach")
 
 ####Soil Moisture Content Calculations----------
 

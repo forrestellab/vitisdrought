@@ -6,7 +6,7 @@ library(readxl)
 library(ggplot2)
 library(ggpubr)
 
-setwd("~/Documents/Master_Thesis/Master_Thesis")
+setwd("~/Documents/GitHub/vitisdrought/MS_Kaltenbach")
 
 ##Harvest Graphs####
 
