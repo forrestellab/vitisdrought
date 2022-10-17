@@ -76,81 +76,97 @@ waterpotentials_gathered<- (waterpotentials_gathered%>%
         mutate(Date= recode(Date, "12/16" = "12/11-18"))%>%
         mutate(Date= recode(Date, "12/17" = "12/11-18"))%>%
         mutate(Date= recode(Date, "12/18" = "12/11-18"))%>%
-        mutate(PD = as.numeric(gsub(",", ".", PD)))
+        mutate(PD = as.numeric(gsub(",", ".", PD))) #%>%
+        #subset(select = -c(SWP, LWP, LWP.area, SWP.area) )
+        
+# Modifying Data Sets
+      LWP_short = subset(LWP_data, select = -c(PD, SWP, SWP.area, PD.area) )
+      SWP_short = subset(SWP_data, select = -c(PD, LWP, LWP.area, PD.area) )
+      PD_short = subset(PD_data, select = -c(SWP, LWP, LWP.area, SWP.area) )
+
+
+
+      #Combining Data Sets  
+      
+      joined_LWP_SWP <- left_join(LWP_short, SWP_short, 
+                               by = c("ID" = "ID", "Genotype" = "Genotype", "Treatment" = "Treatment",
+                                        "species_geno" = "species_geno", "Date" = "Date"))
+      
+      joined_WP <- left_join(joined_LWP_SWP, PD_short, 
+                                 by = c("ID" = "ID", "Genotype" = "Genotype", "Treatment" = "Treatment",
+                                        "species_geno" = "species_geno", "Date" = "Date"))
+      joined_WP <-arrange(joined_WP, ID)
+     
+#lengthen data
+      joined_WP_long<- pivot_longer(joined_WP, c(SWP, LWP, PD), names_to = "WPType", values_to = "WP") 
+    
       
 
-      
 # -------  Plotting WP
-genosLWP<-unique(LWP_data$species_geno)
+genosWP<-unique(joined_WP_long$species_geno)
 order1<-c("11/9-11","11/16-17","12/01-02","12/11-18")
-genosSWP<-unique(SWP_data$species_geno)
-genosPD<-unique(PD_data$species_geno)
+order2<-c("12/11-18")
 
 
-#library(foreach)
-#foreach(i = genosLWP, j = genosSWP, k =genosPD) %do% {
 
-for (i in genosLWP, j in genosSWP, k in genosPD ) {
 
-  # Plotting LWP
-  LWP_plot<-LWP_data%>%
-    filter(species_geno == i)%>%
-    ggplot(aes(x = Date, Y = is.na(LWP), fill = Treatment))+ #does the is.na function help here?
-    geom_boxplot(aes(y =-LWP))+
-    theme_classic()+
-    scale_x_discrete(limits = order1)+
-    scale_y_continuous(name = "WP (in bar)", limits=c(-20, -1), breaks = seq(-20, -1, by = 2))+
-    xlab(NULL)+
-    theme(axis.text.x = element_text(angle = 60, hjust = 1))+
-    theme(legend.position="none")
-  #print(LWP_plot)
+
+for (i in genosWP) {
+
+# Plotting WP
+LWP_plot<-joined_WP_long%>%
+          filter(species_geno == i) %>%
+          filter(WPType == "LWP" ) %>% 
+          ggplot(aes(x = Date, Y = WP, fill = Treatment))+ 
+          geom_boxplot(aes(y =-WP))+
+          theme_classic()+
+          #scale_x_discrete(limits = order1)+
+          #scale_y_continuous(name = "WP (in bar)", limits=c(-20, -1), breaks = seq(-20, -1, by = 2))+
+          xlab(NULL)+
+          theme(axis.text.x = element_text(angle = 60, hjust = 1))+
+          theme(legend.position="none")+
+          ggtitle(i)
+#print(LWP_plot)
+
+
+
+SWP_plot<-joined_WP_long%>%
   
+          filter(species_geno == i)%>%
+          filter(WPType == "SWP" ) %>% 
+          ggplot(aes(x = Date, Y = WP, fill = Treatment))+
+          geom_boxplot(aes(y = -WP))+
+          #scale_y_continuous(name = "", limits=c(-20, -1), breaks = seq(-20, -1, by = 2))+
+          #scale_x_discrete(limits = order2)+
+          theme_classic()+
+          xlab(NULL)+
+          theme(legend.position="none")+
+          ggtitle(i)
 
-##--- Plotting Stem Water Potential##
-
-
-
-  SWP_plot<-SWP_data%>%
-    filter(species_geno == j)%>%
-    ggplot(aes(x = Date, Y = SWP, fill = Treatment))+
-    geom_boxplot(aes(y =-SWP))+
-    scale_y_continuous(name = "", limits=c(-20, -1), breaks = seq(-20, -1, by = 2))+
-    theme_classic()+
-    xlab(NULL)+
-    theme(legend.position="none")
-  #print(SWP_plot)
+#print(SWP_plot)
 
 
-##Plotting Predawn Water Potential## 
+PD_plot<-joined_WP_long%>%
+          filter(species_geno == i)%>%
+          filter(WPType == "PD" ) %>% 
+          ggplot(aes(x = Date, Y = WP, fill = Treatment))+
+          geom_boxplot(aes(y =- WP))+
+          theme_classic()+
+          #scale_y_continuous(name = "", limits=c(-20, -1), breaks = seq(-20, -1, by = 2))+
+          xlab(NULL)+
+          #scale_x_discrete(limits = order2)+
+          theme(legend.position="none")+
+          ggtitle(i)
+#print(PD_plot)
+
+###--Merging the PSWC, POSWC and WU plots 
+
+plot1 <-ggarrange( c(LWP_plot, NULL, SWP_plot, NULL, PD_plot), ncol=5, nrow=1, widths =  c(3, 0.00001, 3, 0.00001, 3), common.legend = TRUE, legend="bottom",align = "v", labels = "LWP", "SWP", "PD") #merge the 3 plots from above together
 
 
-  PD_plot<-PD_data%>%
-    filter(species_geno == k)%>%
-    ggplot(aes(x = Date, Y = PD, fill = Treatment))+
-    geom_boxplot(aes(y =-PD))+
-    theme_classic()+
-    scale_y_continuous(name = "", limits=c(-20, -1), breaks = seq(-20, -1, by = 2))+
-    xlab(NULL)+
-    theme(axis.text.x = element_text(angle = 60, hjust = 1))+
-    theme(legend.position="none")
-  
-  #print(PD_plot)
-  
-  ###--Merging the PSWC, POSWC and WU plots 
-  
-  plot1 <-ggarrange(LWP_plot, NULL, SWP_plot, NULL, PD_plot, ncol=5, nrow=1, widths =  c(3, 0.00001, 3, 0.00001, 3), common.legend = TRUE, legend="bottom",align = "v", labels = "LWP", "SWP", "PD") #merge the 3 plots from above together
-  
-  
-  combined <- annotate_figure(plot1, top = text_grob((paste("SWC & WU  of", i)), color = "black", face = "italic", size = 11)) #add title as genotype
-  
-  print(combined)
-  #path to save all files:
-  #ggsave(paste0("fig_output/WP/PD/PD",i, ".pdf"))
-  #ggsave(paste0("fig_output/WP/PD/PD",i, ".png"))
-  
-  #path to save subset files: 
-  #ggsave(paste0("fig_output/WP/Subset/PD/PD",i, ".png"))
-  #ggsave(paste0("fig_output/WP/Subset/PD/PD",i, ".pdf"))
-  
-  
+combined <- annotate_figure(plot1, top = text_grob((paste(" WP  of", i)), color = "black", face = "italic", size = 11)) #add title as genotype 
+
+print(combined)
+
 }
+
