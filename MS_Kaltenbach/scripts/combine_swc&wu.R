@@ -1,3 +1,10 @@
+# Combining Soil Water Content and Water Usage
+
+# General Notes -----------------------------------------------------------
+ 
+    # still need to concider the weight of the bamboo-shoots in the calculations 
+
+# Packages ----------------------------------------------------------------
 
 library(tidyverse)
 library(stringr)
@@ -6,52 +13,57 @@ library(readxl)
 library(ggplot2)
 library(ggpubr)
 
-#set working directory
+# For the boxplot (themes)
+library(tidyverse)
+library(hrbrthemes)
+library(viridis)
 
+#set working directory
 setwd("~/Documents/GitHub/vitisdrought/MS_Kaltenbach")
 
+# Import Data -------------------------------------------------------------
+
 # read file for entire data set
-#swclong<-read.csv("data/WaterUse_SWC_Clean.csv") 
-#swclong<- (swclong%>%
-            # mutate( species_geno = paste(Species, Genotype, sep = "_")))
+swclong<-read.csv("data/WaterUse_SWC_Clean.csv") 
+swclong<- (swclong%>%
+            mutate( species_geno = paste(Species, Genotype, sep = "_")))
 
 # read file for subset 
 swclong<- read.csv("data/Subset/sub_swc.csv")
 
 
-#to calculate Pre-Water SWC: PWSWC = (PWW/mpot)*100 (Note: Bamboo-Shoots are not in the calculations)
+# SWC Calculations ---------------------------------------------------------
+  #Pre-Water SWC: PWSWC = (PWW/mpot)*100 (Note: Bamboo-Shoots are not in the calculations)
+  swclong$PSWC= swclong$PWW/swclong$mPot..kg.
 
-swclong$PSWC= swclong$PWW/swclong$mPot..kg.
-
-#to calculate Post-Water SWC: POSWC = (POWW/mpot)*100
-#if no watering happened: pre-water weight used instead of Post-Water Weight
-
-swclong<-swclong%>%
+  #to calculate Post-Water SWC: POSWC = (POWW/mpot)*100
+  #if no watering happened: pre-water weight used instead of Post-Water Weight
+  swclong<-swclong%>%
   mutate(POSWC = ((ifelse(is.na(POWW),PWW,POWW)))/swclong$mPot..kg.)
-### Combined Plot
+
+
+# Combine SWC Plot --------------------------------------------------------
 
 accessions<-unique(swclong$species_geno)
-
 for (i in accessions) {
   
-#### Pre-Water SMC Graphs---------------------------------------------------  
+## Pre-Water SWC Graphs---------------------------------------------------  
       error.pswc <- swclong %>%
       filter(species_geno == i)%>%
       group_by(Date, Treatment) %>%
       summarise(
         sd = sd(PSWC, na.rm = TRUE),
-        se = (sd(PSWC)/sqrt(length(PSWC))), #   #how to calculate standard error? (sd(PSWC)/sqrt(length(PSWC)))
-        len = mean(PSWC), #what does this part stand for?
+        se = (sd(PSWC)/sqrt(length(PSWC))), 
+        len = mean(PSWC), 
         Treatment = Treatment,
         Date = Date)
     
     PSWCplot<-swclong%>% 
       filter(species_geno == i)%>%
       ggplot(aes(y =PSWC, x = as.Date(Date,"%m/%d"), color = Treatment))+
-      geom_point()+ #use point instead of "line", how can I plot the mean and error
-      # how to plot regression curve? and mean sqrt?
+      geom_point()+ 
       stat_summary(fun="mean",geom="line",size = 1)+ # or just points: stat_summary(fun="mean",geom="point",size = 2, shape = 3)+
-      geom_errorbar(aes(x = as.Date(Date,"%m/%d"), y = len, #is standard error here correct written?
+      geom_errorbar(aes(x = as.Date(Date,"%m/%d"), y = len, 
                         ymin = len-se,
                         ymax = len+se),
                     color = "black",
@@ -63,12 +75,12 @@ for (i in accessions) {
       theme(axis.text.x = element_text(angle = 60, hjust = 1))+
       scale_x_date(date_labels="%m/%d",date_breaks  ="7 days")+
       scale_y_continuous(name = "SWC" , labels = scales::percent, limits=c(0.6, 1.15), breaks = seq(0.6, 1.15, by = 0.1))+
-      theme(legend.position="none")+ #no legend shown since we want to combine all at the bottom
+      theme(legend.position="none")+
       xlab(label = "")
     
     #print(PSWCplot)
   
-#### Post-Water SMC Graphs---------------------------------------------------  
+## Post-Water SWC Graphs---------------------------------------------------  
       error.poswc <- swclong %>%
         filter(species_geno == i)%>% 
         group_by(Date, Treatment) %>%
@@ -101,7 +113,7 @@ for (i in accessions) {
       
       #print(POSWCplot)
 
-###Water Use Graphs------------------------------------------------
+##Water Use Graphs------------------------------------------------
 
       error.wu <- swclong %>%
         filter(species_geno == i)%>%
@@ -112,7 +124,6 @@ for (i in accessions) {
           len = mean(WU),
           Treatment = Treatment,
           Date = Date)
-      
       
       wuplot<-swclong%>%
         filter(species_geno == i)%>%
@@ -135,25 +146,27 @@ for (i in accessions) {
         scale_y_continuous(name = "WU (in L)", limits=c(0.0, 2.1), breaks = seq(0.0, 2.1, by = 0.2))+ 
         theme(legend.position="none")+
         xlab(label = "Date") 
-      #print(wuplot)
-      
-  
-###--Merging the PSWC, POSWC and WU plots 
-  
-  plot1 <-ggarrange(PSWCplot, NULL, POSWCplot, NULL, wuplot, ncol=1, nrow=5, heights =  c(3, 0.00001, 3, 0.00001, 3), common.legend = TRUE, legend="bottom",align = "v") #merge the 3 plots from above together
-  
+     
+       #print(wuplot)
 
-  combined <- annotate_figure(plot1, top = text_grob((paste("SWC & WU  of", i)), color = "black", face = "italic", size = 11)) #add title as genotype
-                  
-  print(combined)
+## Merge PSWC,  POSWC,  WU Plot --------------------------------------------
+
+  plot1 <-ggarrange(PSWCplot, NULL, POSWCplot, NULL, wuplot, ncol=1, nrow=5, heights =  c(3, 0.00001, 3, 0.00001, 3), 
+                    common.legend = TRUE, legend="bottom",align = "v") #merge the 3 plots from above together
+
+  combined <- annotate_figure(plot1, top = text_grob((paste("SWC & WU  of", i)), color = "black", face = "italic", size = 11)) 
   
+  print(combined)
+
+# Save Graph --------------------------------------------------------------
+
   #path to save entire files:
   #ggsave(paste0("fig_output/SWC/Combined/Combined",i, ".png"))
   #ggsave(paste0("fig_output/SWC/Combined/Combined",i, ".pdf"))
   
   #path to save subset files: 
-  ggsave(paste0("fig_output/SWC/Subset/Combined/Combined",i, ".png"))
-  ggsave(paste0("fig_output/SWC/Subset/Combined/Combined",i, ".pdf"))
+  ggsave(paste0("fig_output/Subset/SWC/Combined/Combined",i, ".png"))
+  ggsave(paste0("fig_output/Subset/SWC/Combined/Combined",i, ".pdf"))
   
 }
 

@@ -1,5 +1,12 @@
-## Water Potentials Cambined in 1 Plot#----------
-#make sure to check if entire data set or just subset (different .csv files and saving paths!
+#Waterpotentials Combined
+
+
+# General Notes -----------------------------------------------------------
+
+  #1. some of the dates where excluded in Nicos Code. Why would he do that? Or do we not wantthose days? 
+  #2. some of the genotypes don't have all the data points/ PD was not measured --> how are we handling those?
+
+# Packages ----------------------------------------------------------------
 
 library(tidyverse)
 library(stringr)
@@ -8,165 +15,83 @@ library(readxl)
 library(ggplot2)
 library(ggpubr)
 
+# For the boxplot (themes)
+library(tidyverse)
+library(hrbrthemes)
+library(viridis)
+
 setwd("~/Documents/GitHub/vitisdrought/MS_Kaltenbach")
 
+# Import Data -------------------------------------------------------------
 
-# ---- read file for entire data set
-waterpotentials_gathered <-read.csv("data/Clean_WP.csv", header = TRUE, sep = ";") #had to read it in like this to make it look like a table and not just like a data.frame 
-#---- read file for subset 
-#waterpotentials_gathered <-read.csv("data/Subset/sub_wp.csv")
+# Entire File
+WP_gathered <- read.csv("data/Clean_WP_TAB.csv")
+WP_gathered <- WP_gathered %>% mutate( species_geno = Genotype)
+WP_gathered <- WP_gathered[,c(1,11,3:7)]
 
-# CODE STARTS HERE: 
-waterpotentials_gathered<- (waterpotentials_gathered%>%
-                              mutate( species_geno = Genotype))%>%# unfortunately no "species" column 
-  # to merge together, should've been picked too!
-  mutate(Date = format(as.Date(as.character(Date), "%m.%d"),"%m/%d"))
-
-##  Mutations
-
-#----- Mutation Leaf Water Potential----------
-
-      LWP_data<-waterpotentials_gathered%>% # since it took a few days to completely sample all plants, here, they are consolidated to a data point
-        filter(!is.na(LWP))%>%
-        filter(!is.na(species_geno))%>%
-        mutate(Date= recode(Date, "11/09" = "11/9-11"))%>%
-        mutate(Date= recode(Date, "11/10" = "11/9-11"))%>%
-        mutate(Date= recode(Date, "11/11" = "11/9-11"))%>%
-        mutate(Date= recode(Date, "11/16" = "11/16-17"))%>%
-        mutate(Date= recode(Date, "11/17" = "11/16-17"))%>%
-        mutate(Date= recode(Date, "12/01" = "12/01-02"))%>%
-        mutate(Date= recode(Date, "12/02" = "12/01-02"))%>%
-        mutate(Date= recode(Date, "12/11" = "12/11-18"))%>%
-        mutate(Date= recode(Date, "12/15" = "12/11-18"))%>%
-        mutate(Date= recode(Date, "12/16" = "12/11-18"))%>%
-        mutate(Date= recode(Date, "12/17" = "12/11-18"))%>%
-        mutate(Date= recode(Date, "12/18" = "12/11-18"))%>%
-        mutate(LWP = as.numeric(gsub(",", ".", LWP))) # changed to substitute the "," with a "." so code is running, otherwise invalid data
-
-#View(LWP_plot)  
-
-##------Stem Water Potential Mutation ----##
-  SWP_data<-waterpotentials_gathered%>%
-        filter(!is.na(SWP))%>%
-        filter(!is.na(species_geno))%>%
-        filter(!species_geno == "V37-96")%>%
-        mutate(Date= recode(Date, "12/11" = "12/11-18"))%>%
-        mutate(Date= recode(Date, "12/15" = "12/11-18"))%>%
-        mutate(Date= recode(Date, "12/16" = "12/11-18"))%>%
-        mutate(Date= recode(Date, "12/17" = "12/11-18"))%>%
-        mutate(Date= recode(Date, "12/18" = "12/11-18"))%>%
-        mutate(SWP = as.numeric(gsub(",", ".", SWP)))
-  
-  ##-----Predawn Water Potential## 
-  
-      #NOTES: 11/18 was ALS
-      
-      PD_data<-waterpotentials_gathered%>% #NA introduced by coercion ok
-        filter(!is.na(PD))%>%
-        filter(!is.na(species_geno))%>%
-        filter(!species_geno == "V37-96")%>%
-        mutate(Date= recode(Date, "11/11" = "11/11-13"))%>%
-        mutate(Date= recode(Date, "11/12" = "11/11-13"))%>%
-        mutate(Date= recode(Date, "11/13" = "11/11-13"))%>%
-        mutate(Date= recode(Date, "12/01" = "12/01-03"))%>%
-        mutate(Date= recode(Date, "12/02" = "12/01-03"))%>%
-        mutate(Date= recode(Date, "12/03" = "12/01-03"))%>%
-        mutate(Date= recode(Date, "12/11" = "12/11-18"))%>%
-        mutate(Date= recode(Date, "12/15" = "12/11-18"))%>%
-        mutate(Date= recode(Date, "12/16" = "12/11-18"))%>%
-        mutate(Date= recode(Date, "12/17" = "12/11-18"))%>%
-        mutate(Date= recode(Date, "12/18" = "12/11-18"))%>%
-        mutate(PD = as.numeric(gsub(",", ".", PD))) #%>%
-        #subset(select = -c(SWP, LWP, LWP.area, SWP.area) )
-        
-# Modifying Data Sets
-      LWP_short = subset(LWP_data, select = -c(PD, SWP, SWP.area, PD.area) )
-      SWP_short = subset(SWP_data, select = -c(PD, LWP, LWP.area, PD.area) )
-      PD_short = subset(PD_data, select = -c(SWP, LWP, LWP.area, SWP.area) )
+# Subset
+WP_gathered <-read.csv("data/Subset/sub_wp.csv")
+WP_gathered <- WP_gathered[,c(2,12,4:8)]
 
 
+# Clean Data --------------------------------------------------------------
 
-      #Combining Data Sets  
-      
-      joined_LWP_SWP <- left_join(LWP_short, SWP_short, 
-                               by = c("ID" = "ID", "Genotype" = "Genotype", "Treatment" = "Treatment",
-                                        "species_geno" = "species_geno", "Date" = "Date"))
-      
-      joined_WP <- left_join(joined_LWP_SWP, PD_short, 
-                                 by = c("ID" = "ID", "Genotype" = "Genotype", "Treatment" = "Treatment",
-                                        "species_geno" = "species_geno", "Date" = "Date"))
-      joined_WP <-arrange(joined_WP, ID)
-     
-#lengthen data
-      joined_WP_long<- pivot_longer(joined_WP, c(SWP, LWP, PD), names_to = "WPType", values_to = "WP") 
-    
-      
+WP_gathered$Date <- as.factor(WP_gathered$Date)
+WP_gathered$Month <- substr(WP_gathered$Date,1,2)
+WP_gathered$Day <- substr(WP_gathered$Date,4,5)
 
-# -------  Plotting WP
-genosWP<-unique(joined_WP_long$species_geno)
-order1<-c("11/9-11","11/16-17","12/01-02","12/11-18")
-order2<-c("12/11-18")
+WP_gathered$Date <- paste0(WP_gathered$Month,"/",WP_gathered$Day)
+
+WP_gathered <- WP_gathered[,c(1:7)]
+
+WP_gathered$LWP <- as.numeric(gsub(",", ".", WP_gathered$LWP))
+WP_gathered$SWP <- as.numeric(gsub(",", ".", WP_gathered$SWP))
+WP_gathered$PD <- as.numeric(gsub(",", ".", WP_gathered$PD))
 
 
+WP_long <- WP_gathered %>% gather(key = "WPType", value = "WP", LWP,SWP,PD)
+
+WP_long <- na.omit(WP_long)
+
+# ifelse for Date------------------------------------------------------------------
 
 
+WP_long$Date_group <- ifelse(WP_long$Date=="11/9"|WP_long$Date=="11/11","Nov 9 to 11",
+                             ifelse(WP_long$Date=="11/16"|WP_long$Date=="11/17","Nov 16 to 17",
+                             ifelse(WP_long$Date=="12/1"|WP_long$Date=="12/2","Dec 01 to 02",
+                             ifelse(WP_long$Date=="12/11"|WP_long$Date=="12/15"|WP_long$Date=="12/16"|WP_long$Date=="12/17"|
+                                    WP_long$Date=="12/18","Dec 11 to 18",WP_long$Date))))
+
+# TO ELIMINATE Unwanted Days
+# WP_long <- WP_long %>% group_by(Date_group) %>% filter(!any(world == c("all","the","nonwanted),"dates))
+
+
+# Plot Graph --------------------------------------------------------------
+
+order <- c("11/1","Nov 9 to 11","11/12","11/13","Nov 16 to 17","11/18" ,"Dec 01 to 02","12/3" ,"Dec 11 to 18")
+genosWP<-unique(WP_long$species_geno)
 
 for (i in genosWP) {
-
-# Plotting WP
-LWP_plot<-joined_WP_long%>%
-          filter(species_geno == i) %>%
-          filter(WPType == "LWP" ) %>% 
-          ggplot(aes(x = Date, Y = WP, fill = Treatment))+ 
-          geom_boxplot(aes(y =-WP))+
-          theme_classic()+
-          #scale_x_discrete(limits = order1)+
-          #scale_y_continuous(name = "WP (in bar)", limits=c(-20, -1), breaks = seq(-20, -1, by = 2))+
-          xlab(NULL)+
-          theme(axis.text.x = element_text(angle = 60, hjust = 1))+
-          theme(legend.position="none")+
-          ggtitle(i)
-#print(LWP_plot)
-
-
-
-SWP_plot<-joined_WP_long%>%
   
-          filter(species_geno == i)%>%
-          filter(WPType == "SWP" ) %>% 
-          ggplot(aes(x = Date, Y = WP, fill = Treatment))+
-          geom_boxplot(aes(y = -WP))+
-          #scale_y_continuous(name = "", limits=c(-20, -1), breaks = seq(-20, -1, by = 2))+
-          #scale_x_discrete(limits = order2)+
-          theme_classic()+
-          xlab(NULL)+
-          theme(legend.position="none")+
-          ggtitle(i)
-
-#print(SWP_plot)
-
-
-PD_plot<-joined_WP_long%>%
-          filter(species_geno == i)%>%
-          filter(WPType == "PD" ) %>% 
-          ggplot(aes(x = Date, Y = WP, fill = Treatment))+
-          geom_boxplot(aes(y =- WP))+
-          theme_classic()+
-          #scale_y_continuous(name = "", limits=c(-20, -1), breaks = seq(-20, -1, by = 2))+
-          xlab(NULL)+
-          #scale_x_discrete(limits = order2)+
-          theme(legend.position="none")+
-          ggtitle(i)
-#print(PD_plot)
-
-###--Merging the PSWC, POSWC and WU plots 
-
-plot1 <-ggarrange( c(LWP_plot, NULL, SWP_plot, NULL, PD_plot), ncol=5, nrow=1, widths =  c(3, 0.00001, 3, 0.00001, 3), common.legend = TRUE, legend="bottom",align = "v", labels = "LWP", "SWP", "PD") #merge the 3 plots from above together
-
-
-combined <- annotate_figure(plot1, top = text_grob((paste(" WP  of", i)), color = "black", face = "italic", size = 11)) #add title as genotype 
-
-print(combined)
-
+  new_plot<-WP_long%>%
+    filter(species_geno == i)%>%
+    ggplot(aes(x = Date_group, Y = WP, fill = Treatment))+
+    geom_boxplot(aes(y =-WP))+
+    #scale_y_continuous(name = "", limits=c(-20, -1), breaks = seq(-20, -1, by = 2))+
+    theme_classic()++
+    xlab("Date")+
+    theme(legend.position="none") +
+    theme(axis.text.x = element_text(angle = 60, hjust = 1))+
+    facet_grid(facets = WPType ~ .)+
+    scale_x_discrete(limits = order)+
+    ggtitle(i)
+  print(new_plot)
+  
+  #path to save all files:
+  #ggsave(paste0("fig_output/WP/PD/PD",i, ".png"))
+  #ggsave(paste0("fig_output/WP/PD/PD",i, ".pdf"))
+  
+  #path to save subset files: 
+  ggsave(paste0("fig_output/Subset/WP/WPcombined/WPcombined",i, ".png"))
+  ggsave(paste0("fig_output/Subset/WP/WPcombined/WPcombined",i, ".pdf"))
 }
-
