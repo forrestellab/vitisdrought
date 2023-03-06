@@ -74,10 +74,11 @@ for (i in accessions) {
       theme_classic()+
       theme(axis.text.x = element_text(angle = 60, hjust = 1))+
       scale_x_date(date_labels="%m/%d",date_breaks  ="7 days")+
-      scale_y_continuous(name = "SWC" , labels = scales::percent, limits=c(0.6, 1.15), breaks = seq(0.6, 1.15, by = 0.1))+
+      scale_y_continuous(name = "PSWC" , labels = scales::percent, limits=c(0.6, 1.15), breaks = seq(0.6, 1.15, by = 0.1))+
       theme(legend.position="none")+
       xlab(label = "")
     
+  
     #print(PSWCplot)
   
 ## Post-Water SWC Graphs---------------------------------------------------  
@@ -107,7 +108,7 @@ for (i in accessions) {
         theme_classic()+
         theme(axis.text.x = element_text(angle = 60, hjust = 1))+
         scale_x_date(date_labels="%m/%d",date_breaks  ="7 days")+
-        scale_y_continuous(name = "SWC" , labels = scales::percent, limits=c(0.6, 1.15), breaks = seq(0.6, 1.15, by = 0.1))+
+        scale_y_continuous(name = "POSWC" , labels = scales::percent, limits=c(0.6, 1.15), breaks = seq(0.6, 1.15, by = 0.1))+
         theme(legend.position="none")+
         xlab(label = "")
       
@@ -143,7 +144,7 @@ for (i in accessions) {
         theme(axis.text.x = element_text(angle = 60, hjust = 1))+
         scale_x_date(date_labels="%m/%d",date_breaks  ="7 days")+
         xlab(label = "Date")+
-        scale_y_continuous(name = "WU (in L)", limits=c(0.0, 2.1), breaks = seq(0.0, 2.1, by = 0.2))+ 
+        scale_y_continuous(name = "WU (L)", limits=c(0.0, 2.1), breaks = seq(0.0, 2.1, by = 0.2))+ 
         theme(legend.position="none")+
         xlab(label = "Date") 
      

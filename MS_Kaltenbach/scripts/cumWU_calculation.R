@@ -51,7 +51,7 @@ for (i in genos) {
     filter(species_geno == i)%>%
     ggplot(aes(x = Genotype, Y = sumwu, fill = Treatment))+
     geom_boxplot(aes(y = sumwu))+
-    scale_y_continuous(name = "WU (in liters)", limits=c(0, 21), breaks = seq(0, 21, by = 2))+
+    scale_y_continuous(name = "WU (L)", limits=c(0, 21), breaks = seq(0, 21, by = 2))+
     theme_classic()+
     ggtitle(paste("Cumulative WU of", i))
   print(cumWU_plot)

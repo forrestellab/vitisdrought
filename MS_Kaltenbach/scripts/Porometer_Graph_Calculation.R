@@ -6,7 +6,6 @@
 # Notes from Miriam:    
 
     #1. I excluded the "ylim(0,1)" since it cut of some values while plotting the boxplot.
-    #2. what is the general scale/unit for Porometer
     #3. why did Nico exclude some of the dates in his plots and mutated only some?
     #4. why did Nico mutate 11/30 but i can't find any measurements for this day in the data?
 
@@ -43,33 +42,50 @@ gswclean <-read.csv("data/Subset/sub_gswc.csv")
 
 gswclean<-gswclean%>%
   filter(!is.na(gsw_porometer))%>%
+  filter(!(gsw_porometer>1))%>%
   filter(!is.na(species_geno))%>%
   mutate(Date = format(as.Date(as.character(Date),"%m.%d"),"%m/%d"))
+
+# Average Data on Plant Level per day (combine reps) --------------------------------------------------------------
+
+gswclean<-gswclean%>%
+  group_by(Code_Date, ID, Date, Treatment, species_geno, Genotype) %>%
+  summarise_at(vars(gsw_porometer), mean)
+
+
 
 # ifelse for Date ---------------------------------------------------------
 
 gswclean$Date <- ifelse(gswclean$Date=="10/26"|gswclean$Date=="10/27","10/26-27",
                              ifelse(gswclean$Date=="11/16"|gswclean$Date=="11/17","11/16-17",
+                                    ifelse(gswclean$Date=="11/02"|gswclean$Date=="11/03", "11/02-03",
                                     ifelse(gswclean$Date=="11/23"|gswclean$Date=="11/24", "11/23-24",
                                     ifelse(gswclean$Date=="11/30"|gswclean$Date=="12/2","11/30-12/2",
-                                           gswclean$Date))))
+                                           gswclean$Date)))))
+
+
+
+#write.csv(gswclean, file= "data/Subset/new/Porometer.csv")
 
 # Plot Graph --------------------------------------------------------------
 
 genos<-unique(gswclean$species_geno)
-order <- c("10/26-27", "11/02","11/03","11/06","11/11","11/16-17","11/23-24" ,"12/02")
+order <- c("10/26-27", "11/02-03","11/06","11/11","11/16-17","11/23-24" ,"12/02")
 
 for (i in genos) {
   GSW_plot<-gswclean%>%
     filter(species_geno == i)%>%
     ggplot(aes(x = Date, Y = gsw_porometer, fill = Treatment))+
     geom_boxplot(aes(y =gsw_porometer))+
-    #ylim(0,1)+
+    ylim(0,1)+
     #scale_x_discrete(limits = order)+
     theme_classic()+
     theme(axis.text.x = element_text(angle = 60, hjust = 1))+
+    ylab("Gs (mmol m−2 s−1)")+
     ggtitle(i)
   print(GSW_plot)
+  
+
 
 # Save Plot ---------------------------------------------------------------
 
@@ -78,7 +94,7 @@ for (i in genos) {
   #ggsave(paste0("fig_output/Porometer/Porometer",i,".pdf"))
   
   #path to save subset files: 
-  ggsave(paste0("fig_output/Subset/Porometer/Porometer",i, ".png"))
-  ggsave(paste0("fig_output/Subset/Porometer/Porometer",i, ".pdf"))
+  #ggsave(paste0("fig_output/Subset/Porometer/Porometer",i, ".png"))
+  #ggsave(paste0("fig_output/Subset/Porometer/Porometer",i, ".pdf"))
 }
 

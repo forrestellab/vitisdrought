@@ -166,7 +166,7 @@ for (i in accessions) {
     theme(axis.text.x = element_text(angle = 60, hjust = 1))+
     scale_x_date(date_labels="%m/%d",date_breaks  ="7 days")+
     xlab(label = "Date")+
-    scale_y_continuous(name = "WU (in L)", limits=c(0.0, 2.8), breaks = seq(0.0, 2.8, by = 0.2))+ 
+    scale_y_continuous(name = "WU (L)", limits=c(0.0, 2.8), breaks = seq(0.0, 2.8, by = 0.2))+ 
     theme(legend.position="bottom")+
     ggtitle(paste("WU of", i))
   print(wuplot)
@@ -176,7 +176,7 @@ for (i in accessions) {
   #ggsave(paste0("fig_output/SWC/WU/WU",i, ".pdf"))
   
   #path to save subset files: 
-  #ggsave(paste0("fig_output/SWC/Subset/WU/WU",i, ".png"))
-  #ggsave(paste0("fig_output/SWC/Subset/WU/WU",i, ".pdf"))
+  ggsave(paste0("fig_output/SWC/Subset/WU/WU",i, ".png"))
+  ggsave(paste0("fig_output/SWC/Subset/WU/WU",i, ".pdf"))
 }
 

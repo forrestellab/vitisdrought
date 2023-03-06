@@ -53,6 +53,8 @@ gswclean_6800$Date <- ifelse(gswclean_6800$Date=="10/26"|gswclean_6800$Date=="10
                             |gswclean_6800$Date=="12/08" |gswclean_6800$Date=="12/09","12/06-09",
                              gswclean_6800$Date)))
 
+#write.csv(gswclean_6800, file= "data/Subset/new/Licor.csv")
+
 # Plot Graph --------------------------------------------------------------
   
 genos<-unique(gswclean_6800$species_geno)

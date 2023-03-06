@@ -3,7 +3,8 @@
 
 # General Notes -----------------------------------------------------------
 
-  #1. some of the dates where excluded in Nicos Code. Why would he do that? Or do we not wantthose days? 
+  #1. some of the dates where excluded in Nicos Code. Why would he do that? Or do we not want those days? 
+      # I decided to combine Novemeber 9 to 13 especially since there weren't that many values and excluded 11/1 as there are only values         for the LWP 
   #2. some of the genotypes don't have all the data points/ PD was not measured --> how are we handling those?
 
 # Packages ----------------------------------------------------------------
@@ -56,11 +57,18 @@ WP_long <- na.omit(WP_long)
 # ifelse for Date------------------------------------------------------------------
 
 
-WP_long$Date_group <- ifelse(WP_long$Date=="11/9"|WP_long$Date=="11/11","Nov 9 to 11",
-                             ifelse(WP_long$Date=="11/16"|WP_long$Date=="11/17","Nov 16 to 17",
-                             ifelse(WP_long$Date=="12/1"|WP_long$Date=="12/2","Dec 01 to 02",
+WP_long$Date_group <- ifelse(WP_long$Date=="11/9"|WP_long$Date=="11/11" | WP_long$Date=="11/12"|WP_long$Date=="11/13", "Nov 9 to 13",
+                             ifelse(WP_long$Date=="11/16"|WP_long$Date=="11/17" |WP_long$Date=="11/18","Nov 16 to 18",
+                             ifelse(WP_long$Date=="12/1"|WP_long$Date=="12/2" |WP_long$Date=="12/3","Dec 01 to 03",
                              ifelse(WP_long$Date=="12/11"|WP_long$Date=="12/15"|WP_long$Date=="12/16"|WP_long$Date=="12/17"|
                                     WP_long$Date=="12/18","Dec 11 to 18",WP_long$Date))))
+
+
+
+
+#dir.create("data/Subset/new")
+#write.csv(WP_long, file= "data/Subset/new/combined_WP.csv")
+
 
 # TO ELIMINATE Unwanted Days
 # WP_long <- WP_long %>% group_by(Date_group) %>% filter(!any(world == c("all","the","nonwanted),"dates))
@@ -68,7 +76,7 @@ WP_long$Date_group <- ifelse(WP_long$Date=="11/9"|WP_long$Date=="11/11","Nov 9 t
 
 # Plot Graph --------------------------------------------------------------
 
-order <- c("11/1","Nov 9 to 11","11/12","11/13","Nov 16 to 17","11/18" ,"Dec 01 to 02","12/3" ,"Dec 11 to 18")
+order <- c("Nov 9 to 13","Nov 16 to 18","Dec 01 to 03" ,"Dec 11 to 18")
 genosWP<-unique(WP_long$species_geno)
 
 for (i in genosWP) {
@@ -78,7 +86,7 @@ for (i in genosWP) {
     ggplot(aes(x = Date_group, Y = WP, fill = Treatment))+
     geom_boxplot(aes(y =-WP))+
     #scale_y_continuous(name = "", limits=c(-20, -1), breaks = seq(-20, -1, by = 2))+
-    theme_classic()++
+    theme_classic()+
     xlab("Date")+
     theme(legend.position="none") +
     theme(axis.text.x = element_text(angle = 60, hjust = 1))+

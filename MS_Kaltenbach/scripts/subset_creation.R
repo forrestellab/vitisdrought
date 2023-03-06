@@ -51,3 +51,25 @@ sub_geswc_6800<- (gswclean_6800%>%
                mutate( species_geno = Genotype)) # unfortunately no "species" column to merge together, should've been picked too!
 
 write.csv(sub_geswc_6800, file= "data/Subset/sub_gswc_6800.csv")
+
+
+# Harvest Data ----------------------------------------------------------------
+
+harvest_csv<-read.csv("data/harvest_clean_mk.csv") 
+sub_harvest<-(harvest_csv%>%
+             filter(Genotype %in% c("9018", "T52", "b40-14", "9031", "9035", "b42-34", "SC2", 
+                                    "TX6704", "T48", "NY1", "TXNM0821", "Vru42", "V60-96" )))
+
+write.csv(sub_harvest, file= "data/Subset/Harvest.csv")
+
+# Harvest Leaf Data ----------------------------------------------------------------
+
+harvest_leaf<-read.csv("data/harvest_leaf_clean_mk.csv") 
+sub_harvest<-harvest_leaf%>%
+              filter(Genotype %in% c("9018", "T52", "b40-14", "9031", "9035", "b42-34", "SC2", 
+                                       "TX6704", "T48", "NY1", "TXNM0821", "Vru42", "V60-96" ))%>%
+              select(-c(X))
+
+write.csv(sub_harvest, file= "data/Subset/Harvest_Leaf.csv")
+
+
