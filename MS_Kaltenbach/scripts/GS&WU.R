@@ -65,6 +65,10 @@ joined_df<- merge(gswclean, swclong1, by= c("Genotype", "Treatment", "ID", "Date
 joined_df <-  gather(joined_df, key = "Type", value = "value", "WU (L)", "Gs (mmol m−2 s−1)")
 joined_df <- drop_na(joined_df)
 
+
+write.csv(joined_df, file= "data/Subset/sub_small_gswc.csv")
+
+
 # Plot Graph ---------------------------------------------------------
 
 genosWP<-unique(joined_df$Genotype)
@@ -106,8 +110,8 @@ for (i in genosWP) {
   print(plot)
   
   #path to save subset files: 
-  ggsave(paste0("fig_output/Subset/GS_WU_Combined/GS_WU_Combined",i, ".png"))
-  ggsave(paste0("fig_output/Subset/GS_WU_Combined/GS_WU_Combined",i, ".pdf"))
+  ggsave(paste0("fig_output/Subset_small/GS_WU_Combined/GS_WU_Combined",i, ".png"))
+  ggsave(paste0("fig_output/Subset_small/GS_WU_Combined/GS_WU_Combined",i, ".pdf"))
   
 }
 

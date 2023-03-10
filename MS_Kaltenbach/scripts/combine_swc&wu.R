@@ -13,6 +13,8 @@ library(readxl)
 library(ggplot2)
 library(ggpubr)
 
+
+
 # For the boxplot (themes)
 library(tidyverse)
 library(hrbrthemes)
@@ -166,8 +168,8 @@ for (i in accessions) {
   #ggsave(paste0("fig_output/SWC/Combined/Combined",i, ".pdf"))
   
   #path to save subset files: 
-  ggsave(paste0("fig_output/Subset/SWC/Combined/Combined",i, ".png"))
-  ggsave(paste0("fig_output/Subset/SWC/Combined/Combined",i, ".pdf"))
+  ggsave(paste0("fig_output/Subset_small/SWC/Combined/Combined",i, ".png"))
+  ggsave(paste0("fig_output/Subset_small/SWC/Combined/Combined",i, ".pdf"))
   
 }
 

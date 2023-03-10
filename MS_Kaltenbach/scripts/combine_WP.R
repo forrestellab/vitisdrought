@@ -66,6 +66,9 @@ WP_long$Date_group <- ifelse(WP_long$Date=="11/9"|WP_long$Date=="11/11" | WP_lon
 
 
 
+#write.csv(WP_long, file= "data/Subset/sub_small_WP.csv")
+
+
 #dir.create("data/Subset/new")
 #write.csv(WP_long, file= "data/Subset/new/combined_WP.csv")
 
@@ -100,6 +103,6 @@ for (i in genosWP) {
   #ggsave(paste0("fig_output/WP/PD/PD",i, ".pdf"))
   
   #path to save subset files: 
-  ggsave(paste0("fig_output/Subset/WP/WPcombined/WPcombined",i, ".png"))
-  ggsave(paste0("fig_output/Subset/WP/WPcombined/WPcombined",i, ".pdf"))
+  ggsave(paste0("fig_output/Subset_small/WP/WPcombined/WPcombined",i, ".png"))
+  ggsave(paste0("fig_output/Subset_small/WP/WPcombined/WPcombined",i, ".pdf"))
 }

@@ -55,6 +55,8 @@ gswclean_6800$Date <- ifelse(gswclean_6800$Date=="10/26"|gswclean_6800$Date=="10
 
 #write.csv(gswclean_6800, file= "data/Subset/new/Licor.csv")
 
+write.csv(SWP_data, file= "data/Subset/sub_small_Licor.csv")
+
 # Plot Graph --------------------------------------------------------------
   
 genos<-unique(gswclean_6800$species_geno)
@@ -74,6 +76,6 @@ for (i in genos) {
   #ggsave(paste0("fig_output/Licor6800/Licor6800",i,".pdf"))
   
   #path to save subset files: 
-  #ggsave(paste0("fig_output/Subset/Licor6800/Licor6800",i, ".png"))
-  #ggsave(paste0("fig_output/Subset/Licor6800/Licor6800",i, ".pdf"))
+  ggsave(paste0("fig_output/Subset_small/Licor6800/Licor6800",i, ".png"))
+  ggsave(paste0("fig_output/Subset_small/Licor6800/Licor6800",i, ".pdf"))
 }

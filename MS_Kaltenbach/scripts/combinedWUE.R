@@ -17,8 +17,8 @@ library(ggpubr)
 
 # For the boxplot (themes)
 library(tidyverse)
-library(hrbrthemes)
-library(viridis)
+#library(hrbrthemes)
+#library(viridis)
 
 
 # Import data -------------------------------------------------------------
@@ -32,8 +32,8 @@ gswclean_6800<- gswclean_6800%>%
 
 
 gswclean_6800 <-(gswclean_6800%>%
-                   filter(Genotype %in% c("9018", "T52", "b40-14", "9031", "9035", "b42-34", "SC2", 
-                                          "TX6704", "T48", "NY1", "TXNM0821", "Vru42", "V60-96" )))
+                   filter(Genotype %in% c("9018", "T52", "b40-14",  "b42-34", 
+                                          "T48", "NY1", "TXNM0821", "Vru42", "V60-96" )))
 
 # Clean Data --------------------------------------------------------------
 
@@ -97,7 +97,7 @@ for (i in genos) {
   
   
   #path to save subset files: 
-       #ggsave(paste0("fig_output/Subset/combinedWUE/combinedWUE",i, ".png"))
-       #ggsave(paste0("fig_output/Subset/combinedWUE/combinedWUE",i, ".pdf"))
+       ggsave(paste0("fig_output/Subset_small/combinedWUE/combinedWUE",i, ".png"))
+       ggsave(paste0("fig_output/Subset_small/combinedWUE/combinedWUE",i, ".pdf"))
         
 }

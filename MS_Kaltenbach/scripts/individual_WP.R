@@ -37,7 +37,9 @@ LWP_data<-waterpotentials_gathered%>% # since it took a few days to completely s
   mutate(Date= recode(Date, "12/16" = "12/11-18"))%>%
   mutate(Date= recode(Date, "12/17" = "12/11-18"))%>%
   mutate(Date= recode(Date, "12/18" = "12/11-18"))%>%
-  mutate(LWP = as.numeric(gsub(",", ".", LWP))) # changed to substitute the "," with a "." so code is running, otherwise invalid data
+  mutate(LWP = as.numeric(gsub(",", ".", LWP)))
+
+# write.csv(LWP_data, file= "data/Subset/sub_small_LWP.csv")
 
 #View(LWP_plot)  
 
@@ -61,11 +63,12 @@ for (i in genosLWP) {
   #ggsave(paste0("fig_output/WP/Subset/LWP/LWP",i, ".pdf"))
   
   #path to save subset files: 
-  ggsave(paste0("fig_output/WP/Subset/LWP/LWP",i, ".png"))
-  ggsave(paste0("fig_output/WP/Subset/LWP/LWP",i, ".pdf"))
+  ggsave(paste0("fig_output/WP/Subset_small/LWP/LWP",i, ".png"))
+  ggsave(paste0("fig_output/WP/Subset_small/LWP/LWP",i, ".pdf"))
   
   #there is still a warning message: saying that there were rows containing missing values removed
 } 
+
 
 ##Stem Water Potential##
 SWP_data<-waterpotentials_gathered%>%
@@ -78,6 +81,8 @@ SWP_data<-waterpotentials_gathered%>%
   mutate(Date= recode(Date, "12/17" = "12/11-18"))%>%
   mutate(Date= recode(Date, "12/18" = "12/11-18"))%>%
   mutate(SWP = as.numeric(gsub(",", ".", SWP)))
+
+write.csv(SWP_data, file= "data/Subset/sub_small_SWP.csv")
 
 genosSWP<-unique(SWP_data$species_geno)
 
@@ -96,8 +101,8 @@ for (i in genosSWP) {
   #ggsave(paste0("fig_output/WP/SWP/SWP",i, ".pdf"))
   
   #path to save subset files: 
-  ggsave(paste0("fig_output/WP/Subset/SWP/SWP",i, ".png"))
-  ggsave(paste0("fig_output/WP/Subset/SWP/SWP",i, ".pdf"))
+  ggsave(paste0("fig_output/WP/Subset_small/SWP/SWP",i, ".png"))
+  ggsave(paste0("fig_output/WP/Subset_small/SWP/SWP",i, ".pdf"))
 }
 
 ##Predawn Water Potential## 
@@ -121,6 +126,8 @@ PD_data<-waterpotentials_gathered%>% #NA introduced by coercion ok
   mutate(Date= recode(Date, "12/18" = "12/11-18"))%>%
   mutate(PD = as.numeric(gsub(",", ".", PD)))
 
+#write.csv(PD_data, file= "data/Subset/sub_small_PD.csv")
+
 #View(PD_plot) 
 genosPD<-unique(PD_data$species_geno)
   
@@ -140,6 +147,6 @@ genosPD<-unique(PD_data$species_geno)
   #ggsave(paste0("fig_output/WP/PD/PD",i, ".pdf"))
 
     #path to save subset files: 
-    ggsave(paste0("fig_output/WP/Subset/PD/PD",i, ".png"))
-    ggsave(paste0("fig_output/WP/Subset/PD/PD",i, ".pdf"))
+    ggsave(paste0("fig_output/WP/Subset_small/PD/PD",i, ".png"))
+    ggsave(paste0("fig_output/WP/Subset_Small/PD/PD",i, ".pdf"))
 }

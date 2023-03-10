@@ -41,6 +41,7 @@ harvest<-   harvest%>%
 biomass_ratio <- harvest %>%
                  mutate("ratio_canopy_root" = canopy_biomass/root_biomass) 
 
+write.csv(biomass_ratio, file= "data/Subset/sub_small_biomass_ratio.csv")
 
 # Plot Ratio  -------------------------------------------------------------
 
@@ -55,7 +56,7 @@ biomass_ratio_plot<-biomass_ratio %>%
 print(biomass_ratio_plot)
 
         #path to save subset files: 
-        ggsave(paste0("fig_output/Subset/Biomass_Ratio/Biomass_Ratio", ".png"))
-        ggsave(paste0("fig_output/Subset/Biomass_Ratio/Biomass_Ratio", ".pdf"))
+        ggsave(paste0("fig_output/Subset_small/Biomass_Ratio/Biomass_Ratio", ".png"))
+        ggsave(paste0("fig_output/Subset_small/Biomass_Ratio/Biomass_Ratio", ".pdf"))
 
 

@@ -23,6 +23,9 @@ setwd("~/Documents/GitHub/vitisdrought/MS_Kaltenbach")
 # Import Data -------------------------------------------------------------
 
 WUE_final <-read.csv("data/Subset/new/joined_WUE.csv")
+WUE_final<- (WUE_final%>%
+             filter(Genotype %in% c("9018", "T52", "b40-14", "b42-34", 
+                                    "T48", "NY1", "TXNM0821", "Vru42", "V60-96" )))
 
 # to select Wanted Days -------------------------------------------------------------
 
@@ -50,8 +53,8 @@ WUE_final_Plot<-WUE_final%>%
 
   #path to save subset files: 
   
-  ggsave(paste0("fig_output/Subset/bygenotype/WUE_final/WUE_final", ".png"))
-  ggsave(paste0("fig_output/Subset/bygenotype/WUE_final/WUE_final", ".pdf"))
+  ggsave(paste0("fig_output/Subset_small/bygenotype/WUE_final/WUE_final", ".png"))
+  ggsave(paste0("fig_output/Subset_small/bygenotype/WUE_final/WUE_final", ".pdf"))
   
 
 

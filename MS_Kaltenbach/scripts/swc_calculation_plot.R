@@ -18,7 +18,7 @@ swclong<- (swclong%>%
              mutate( species_geno = paste(Species, Genotype, sep = "_")))
 
 # read file for subset 
-#swclong<- read.csv("data/Subset/sub_swc.csv")
+swclong<- read.csv("data/Subset/sub_swc.csv")
 
 
 #to calculate Pre-Water SWC: PWSWC = (PWW/mpot)*100 (Note: Bamboo-Shoots are not in the calculations)
@@ -76,8 +76,8 @@ for (i in accessions) {
   #ggsave(paste0("fig_output/SWC/PSWC/PSWC",i, ".pdf"))
 
   #path to save subset files: 
-  #ggsave(paste0("fig_output/SWC/Subset/PSWC/PSWC",i, ".png"))
-  #ggsave(paste0("fig_output/SWC/Subset/PSWC/PSWC",i, ".pdf"))
+  ggsave(paste0("fig_output/Subset_small/SWC/PSWC1/PSWC1",i, ".png"))
+  ggsave(paste0("fig_output/Subset_small/SWC/PSWC1/PSWC1",i, ".pdf"))
   }
 
 #### Post-Water SMC Graphs---------------------------------------------------  
@@ -125,8 +125,8 @@ for (i in accessions) {
   #ggsave(paste0("fig_output/SWC/POSWC/POSWC",i, ".pdf"))
   
   #path to save subset files: 
-  #ggsave(paste0("fig_output/SWC/Subset/POSWC/POSWC",i, ".png"))
-  #ggsave(paste0("fig_output/SWC/Subset/POSWC/POSWC",i, ".pdf"))
+  ggsave(paste0("fig_output/Subset_small/SWC/POSWC1/POSWC1",i, ".png"))
+  ggsave(paste0("fig_output/Subset_small/SWC/POSWC1/POSWC1",i, ".pdf"))
   
 }
 
@@ -176,7 +176,7 @@ for (i in accessions) {
   #ggsave(paste0("fig_output/SWC/WU/WU",i, ".pdf"))
   
   #path to save subset files: 
-  ggsave(paste0("fig_output/SWC/Subset/WU/WU",i, ".png"))
-  ggsave(paste0("fig_output/SWC/Subset/WU/WU",i, ".pdf"))
+  ggsave(paste0("fig_output/Subset/SWC/WU1/WU",i, ".png"))
+  ggsave(paste0("fig_output/Subset/SWC/WU1/WU",i, ".pdf"))
 }
 

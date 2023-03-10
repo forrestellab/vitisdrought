@@ -116,7 +116,7 @@ leafwp_predawn_combined_plot<-leafwp_predawn_combined %>%
 print(leafwp_predawn_combined_plot)
 
 #path to save subset files: 
-ggsave(paste0("fig_output/Subset/leafwp_predawn_twodates/leafwp_predawn_twodates", ".png"))
-ggsave(paste0("fig_output/Subset/leafwp_predawn_twodates/leafwp_predawn_twodates", ".pdf"))
+ggsave(paste0("fig_output/Subset_small/leafwp_predawn_twodates/leafwp_predawn_twodates", ".png"))
+ggsave(paste0("fig_output/Subset_small/leafwp_predawn_twodates/leafwp_predawn_twodates", ".pdf"))
 
 

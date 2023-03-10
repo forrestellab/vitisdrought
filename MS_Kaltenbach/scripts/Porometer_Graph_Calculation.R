@@ -94,7 +94,7 @@ for (i in genos) {
   #ggsave(paste0("fig_output/Porometer/Porometer",i,".pdf"))
   
   #path to save subset files: 
-  #ggsave(paste0("fig_output/Subset/Porometer/Porometer",i, ".png"))
-  #ggsave(paste0("fig_output/Subset/Porometer/Porometer",i, ".pdf"))
+  ggsave(paste0("fig_output/Subset_small/Porometer/Porometer",i, ".png"))
+  ggsave(paste0("fig_output/Subset_small/Porometer/Porometer",i, ".pdf"))
 }
 

@@ -136,8 +136,8 @@ wuplot<-df%>%
   #ggsave(paste0("fig_output/Porometer/Porometer",i,".pdf"))
   
   #path to save subset files: 
-  ggsave(paste0("fig_output/Subset/GS_WU/GS_WU",i, ".png"))
-  ggsave(paste0("fig_output/Subset/GS_WU/GS_WU",i, ".pdf"))
+  ggsave(paste0("fig_output/Subset_small/GS_WU/GS_WU",i, ".png"))
+  ggsave(paste0("fig_output/Subset_small/GS_WU/GS_WU",i, ".pdf"))
   
 }
 

@@ -27,13 +27,15 @@ setwd("~/Documents/GitHub/vitisdrought/MS_Kaltenbach")
 
 # read file for entire data set
 swclong<-read.csv("data/WaterUse_SWC_Clean.csv") 
+
 swclong<- (swclong%>%
              mutate( species_geno = paste(Species, Genotype, sep = "_")))
 
 # read file for subset 
 swclong<- read.csv("data/Subset/sub_swc.csv")
-
-
+swclong<- (swclong%>%
+               filter(Genotype %in% c("9018", "T52", "b40-14", "b42-34", 
+                                      "T48", "NY1", "TXNM0821", "Vru42", "V60-96" )))
 # Cumulative Wateruse -----------------------------------------------------
 
 cumWU <- swclong %>% 
@@ -41,6 +43,7 @@ cumWU <- swclong %>%
         mutate(csum = cumsum(WU))  %>%
         summarise(sumwu = sum(WU))  
 
+#write.csv(cumWU, file= "data/Subset/sub_small_cumWU.csv")
 
 # Box-Plot Graph----------------------------------------------------------------
 
@@ -63,7 +66,7 @@ for (i in genos) {
   #ggsave(paste0("fig_output/SWC/WU/cumWU/cumWU",i, ".pdf"))
   
   #path to save subset files: 
-  ggsave(paste0("fig_output/Subset/SWC/WU/cumWU/cumWU",i, ".png"))
-  ggsave(paste0("fig_output/Subset/SWC/WU/cumWU/cumWU",i, ".pdf"))
+  ggsave(paste0("fig_output/Subset_small/SWC/WU/cumWU/cumWU",i, ".png"))
+  ggsave(paste0("fig_output/Subset_small/SWC/WU/cumWU/cumWU",i, ".pdf"))
 }
 

@@ -23,6 +23,9 @@ setwd("~/Documents/GitHub/vitisdrought/MS_Kaltenbach")
 # Import Data -------------------------------------------------------------
 
 WP_final <-read.csv("data/Subset/new/combined_WP.csv")
+WP_final<- (WP_final%>%
+               filter(species_geno %in% c("9018", "T52", "b40-14", "b42-34", 
+                                      "T48", "NY1", "TXNM0821", "Vru42", "V60-96" )))
 
 # to select Wanted Days -------------------------------------------------------------
 
@@ -48,6 +51,6 @@ WP_final <- WP_final%>%
   
 # Save Graph --------------------------------------------------------------
   #path to save final day files: 
-  ggsave(paste0("fig_output/Subset/bygenotype/WPcombined/WPcombined", ".png"))
-  ggsave(paste0("fig_output/Subset/bygenotype/WPcombined/WPcombined", ".pdf"))
+  ggsave(paste0("fig_output/Subset_small/bygenotype/WPcombined/WPcombined", ".png"))
+  ggsave(paste0("fig_output/Subset_small/bygenotype/WPcombined/WPcombined", ".pdf"))
 

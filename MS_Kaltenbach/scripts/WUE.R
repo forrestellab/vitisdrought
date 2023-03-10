@@ -78,7 +78,7 @@ for (i in genos) {
   # Save Plot ---------------------------------------------------------------
   
   #path to save subset files: 
-  ggsave(paste0("fig_output/Subset/inWUE/inWUE",i, ".png"))
-  ggsave(paste0("fig_output/Subset/inWUE/inWUE",i, ".pdf"))
+  ggsave(paste0("fig_output/Subset_small/inWUE/inWUE",i, ".png"))
+  ggsave(paste0("fig_output/Subset_small/inWUE/inWUE",i, ".pdf"))
   
 }

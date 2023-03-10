@@ -1,0 +1,8 @@
+swc_csv<-read.csv("data/WaterUse_SWC_Clean.csv") #
+sub_swc<- (swc_csv%>%#
+             filter(Genotype %in% c("9018", "T52", "b40-14", "b42-34", #
+                                   "T48", "NY1", "TXNM0821", "Vru42", "V60-96" ))%>%#
+              mutate( species_geno = paste(Species, Genotype, sep = "_")))#
+#
+dir.create("data/Subset")#
+write.csv(sub_swc, file= "data/Subset/sub_swc.csv")

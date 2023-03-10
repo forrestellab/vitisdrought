@@ -54,6 +54,9 @@ biomass_WU <- joineddf %>%
               mutate("root_wu" = root_biomass/sumwu) %>%
               mutate("Leafarea_wu" = TotalLeafArea/sumwu) 
 
+#write.csv(biomass_WU, file= "data/Subset/sub_small_biomass_WU.csv")
+
+
 biomass_WU_long <-  gather(biomass_WU, key = "Type", value = "value", "canopy_wu", "root_wu", "Leafarea_wu") %>%
                     select(-c(root_biomass, TotalLeafArea, sumwu, canopy_biomass))%>%
                     drop_na()
@@ -73,8 +76,8 @@ biomass_WU_long_plot<-biomass_WU_long%>%
 print(biomass_WU_long_plot)
 
 #path to save subset files: 
-ggsave(paste0("fig_output/Subset/Biomass_WU/Biomass_WU", ".png"))
-ggsave(paste0("fig_output/Subset/Biomass_WU/Biomass_WU", ".pdf"))
+ggsave(paste0("fig_output/Subset_small/Biomass_WU/Biomass_WU", ".png"))
+ggsave(paste0("fig_output/Subset_small/Biomass_WU/Biomass_WU", ".pdf"))
 
 
 
