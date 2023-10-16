@@ -1,0 +1,10 @@
+"Genotype","Species","Sampling.Source","Lat","Long","Annual Mean Temperature","Annual Precipitation","Temperature Seasonality (standard deviation *100)","Mean Temperature of Coldest Quarter"
+"9018","acerifolia","UC Davis Breeding Collections",34.0083,-100.282,16.5,565,853.6,5.2
+"T52","aestivalis","UC Davis Breeding Collections",30.6327,-97.6772,19.2,837,705,9.8
+"b40-14","arizonica","UC Davis Breeding Collections",27.4525,-107.712,15.5,891,438.6,9.9
+"b42-34","cinerea","UC Davis Breeding Collections",25.1085528,-99.8062,22.1,849,516,15.1
+"T48","mustangensis","UC Davis Breeding Collections",30.7592,-98.7003,18.8,701,720.9,9.1
+"NY1","riparia","",43.841723,-73.387025,7.2,919,996.8,-6.3
+"TXNM0821","hybrid","UC Davis Breeding Collections",35.6689,-105.3361,6.7,526,667.1,-1.5
+"Vru42","rupestris","UC Davis Breeding Collections",37.76774,-90.3835,12.4,1105,892.4,0.4
+"V60-96","vulpina","UC Davis Breeding Collections",40.380579,-75.032293,10.7,1172,877,-0.8
