@@ -32,6 +32,9 @@ combined_beg_data<- combined_beg_data %>%
 
 colnames(combined_beg_data)
 
+combined_beg_data$LWP <- combined_beg_data$LWP * 0.1
+combined_beg_data$PD <- combined_beg_data$PD * 0.1
+
 symnum.args = list(cutpoints = c(0, 0.05, 1), symbols = c("*", "ns"))
 
 # Columns to plot

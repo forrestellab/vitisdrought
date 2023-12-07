@@ -29,6 +29,9 @@ combined_mid_data<- combined_mid_data %>%
   mutate(LWP = -LWP)    %>%
   distinct()
 
+combined_mid_data$LWP <- combined_mid_data$LWP * 0.1
+combined_mid_data$PD <- combined_mid_data$PD * 0.1
+
 symnum.args = list(cutpoints = c(0, 0.05, 1), symbols = c("*", "ns"))
 
 # Columns to plot
