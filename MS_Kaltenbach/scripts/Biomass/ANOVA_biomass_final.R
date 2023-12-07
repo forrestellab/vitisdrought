@@ -36,7 +36,7 @@ harvest <- harvest %>%
 
 # Subset and merge data sets
 harvest <- harvest  %>% select(ID, Treatment, Genotype, canopy_biomass, root_biomass)%>%
-                        mutate(ratio_canopy_root = canopy_biomass / root_biomass) 
+                        mutate(ratio_canopy_root = root_biomass / canopy_biomass) 
 
 cumWU <-cumWU %>%select(-X)%>%
   distinct()
@@ -220,4 +220,4 @@ biomass$Treatment_factor <- as.factor(biomass$Treatment)
      merge(canopy_biomass_wu_summary_df, by = c("Species", "Treatment")) %>%
      merge(root_biomass_wu_summary_df, by = c("Species", "Treatment")) 
    
-   write.csv( biomass_anova, file = "data_output/biomass/biomass_anova_1.csv", row.names = FALSE)
+   write.csv( biomass_anova, file = "data_output/biomass/biomass_anova.csv", row.names = FALSE)

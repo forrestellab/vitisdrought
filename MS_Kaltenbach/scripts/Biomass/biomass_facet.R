@@ -82,14 +82,14 @@ species_labels <- c(
 columns <- c("sumwu", "canopy_biomass", "root_biomass", "ratio_canopy_root", "TotalLeafArea", "leafarea_wu", "canopy_biomass_wu", "root_biomass_wu")
 
 variable_labels <- c(
-  `sumwu` = " W[tot]~~~(L)",
+  `sumwu` = " WU[tot]~~~(L)",
   `canopy_biomass` = "m[canopy]~~~(g)",
   `root_biomass` = "m[root]~~~(g)",
-  `ratio_canopy_root` = "m[canopy]/~m[root]~~~(g~g^-1)",
+  `ratio_canopy_root` = "m[root]/~m[canopy]~~~(g~g^-1)",
   `TotalLeafArea` = "A[leaf]~~~(cm^2)",
-  `leafarea_wu` = "A[leaf]/~W[tot]~~~(cm^2~L^-1)", 
-  `canopy_biomass_wu` = "m[canopy]/~W[tot]~~~(g~L^-1)",
-  `root_biomass_wu` = "m[root]/~W[tot]~~~(g~L^-1)"
+  `leafarea_wu` = "A[leaf]/~WU[tot]~~~(cm^2~L^-1)", 
+  `canopy_biomass_wu` = "m[canopy]/~WU[tot]~~~(g~L^-1)",
+  `root_biomass_wu` = "m[root]/~WU[tot]~~~(g~L^-1)"
 )
 
 
